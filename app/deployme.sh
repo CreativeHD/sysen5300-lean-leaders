@@ -12,4 +12,5 @@ rsconnect deploy fastapi \
   ${CONNECT_SERVER:+--server "$CONNECT_SERVER"} \
   ${CONNECT_API_KEY:+--api-key "$CONNECT_API_KEY"} \
   --entrypoint app:app \
+  --exclude ".env" --exclude ".env.*" --exclude ".venv" \
   .
