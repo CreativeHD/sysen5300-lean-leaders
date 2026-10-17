@@ -18,7 +18,7 @@ This specification defines the tool the Lean Leaders team will build for the Cor
 
 **Decision the tool supports:** Determine whether an observed increase in traffic enforcement is statistically unusual and merits further documentation or investigation.
 
-**When this decision occurs:** After a monitoring shift or when a new batch of observations is uploaded.
+**When this decision occurs:** During or immediately after an observation shift, as newly gathered field-observation CSV records become available. The hackathon MVP supports rapid repeat uploads, not automatic live data streaming.
 
 **Why this matches the prompt:** CivicWatch helps concerned citizens and civil rights organizations document and analyze traffic enforcement patterns, including suspected enforcement blitzes occurring outside documented authorized contexts.
 
@@ -176,7 +176,8 @@ CivicWatch will provide:
 3. **SPC dashboard:** Plot observed enforcement rates with calculated center lines and control limits.
 4. **Statistical signals:** Flag monitoring periods with unusually high or low enforcement rates.
 5. **Area or period comparison:** Display rate ratios and confidence intervals after secondary analysis is validated.
-6. **Evidence export:** Download a reproducible summary of observations, statistical results, and assumptions.
+6. **Flagged-observation details:** Display date, zone, shift, observed stops, vehicles observed, stop rate, control limits, authorization status, policy reference, and source type. Show `unknown` when no authenticated policy reference exists.
+7. **Evidence export:** Download a reproducible summary of observations, statistical results, and assumptions.
 
 Each displayed statistic will include units and an explanation written for a nontechnical user.
 
