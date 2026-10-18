@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "locale": "English_United States.1252",
+  "metadata": {
+    "appmode": "python-fastapi",
+    "entrypoint": "app:app"
+  },
+  "python": {
+    "version": "3.12.10",
+    "package_manager": {
+      "name": "pip",
+      "version": "25.0.1",
+      "package_file": "requirements.txt"
+    }
+  },
+  "environment": {
+    "python": {
+      "requires": "~=3.12.0"
+    }
+  },
+  "files": {
+    "requirements.txt": {
+      "checksum": "0142e91faa0ef13181d0f2e6eb99ac45"
+    },
+    ".gitignore": {
+      "checksum": "06f4a6eb58389c14df15ead8ac72780d"
+    },
+    ".python-version": {
+      "checksum": "c3052f53ccf07991da5591cab5ee1274"
+    },
+    "README.md": {
+      "checksum": "ccb0de945ccf1f8af65a47082a9d2d9f"
+    },
+    "app.py": {
+      "checksum": "de36aef5e4a6b3e7b30c28e0a9f479bc"
+    },
+    "deployme.sh": {
+      "checksum": "53d69d9ecb77c8fc2f3cf1a46fe027f8"
+    },
+    "manifestme.sh": {
+      "checksum": "c0b20017d961792f991df5365f8ab86e"
+    },
+    "qc.py": {
+      "checksum": "a1a689f96ec769144596eefc489791c2"
+    },
+    "requirements-dev.txt": {
+      "checksum": "a2447877340864967e6e35fc08ff543f"
+    },
+    "test_app.py": {
+      "checksum": "c30e9b35b30bbfebfaa00b4ec3927fcc"
+    },
+    "testme.sh": {
+      "checksum": "291bedbfe28d498dbb869835194b7837"
+    }
+  }
+}
