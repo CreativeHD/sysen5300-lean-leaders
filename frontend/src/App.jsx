@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
+import { analyzeCsv } from './api'
 import './App.css'
 
 function App() {
@@ -20,26 +21,16 @@ function App() {
     setError('')
     setResults(null)
 
-    const form = new FormData()
-    form.append('file', file)
-
     try {
-      const response = await fetch('/analyze', {
-        method: 'POST',
-        body: form
-      })
-
-      if (!response.ok) throw new Error('Analysis failed')
-
-      const data = await response.json()
+      const data = await analyzeCsv(file)
       setResults(data)
       setZone(data.groups[0].zone_id)
       setShift(data.groups[0].shift)
     } catch (err) {
       setError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const observations = results?.observations || []

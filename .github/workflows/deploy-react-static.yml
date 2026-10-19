@@ -1,0 +1,100 @@
+# Adapted from Cornell Six Sigma Hackathon's Posit Connect static React workflow.
+# Deploys only the React site; never modifies the already deployed FastAPI service.
+name: Deploy CivicWatch React to Posit Connect
+
+on:
+  push:
+    branches: [hackathon-civicwatch]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-react-static.yml'
+      - '.github/scripts/connect-publish-static-async.sh'
+      - '.github/scripts/connect-publish-async.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: civicwatch-react-publish
+  cancel-in-progress: false
+
+env:
+  APP_DIR: frontend
+  CONTENT_NAME: civicwatch-lean-leaders-web
+  CONTENT_TITLE: CivicWatch Dashboard
+  NODE_VERSION: '22'
+  VITE_API_BASE: https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check public API URL configuration
+        run: |
+          set -euo pipefail
+          [ -n "$VITE_API_BASE" ] || { echo "::error::Set VITE_API_BASE to the public API content URL."; exit 1; }
+          case "$VITE_API_BASE" in
+            https://*) ;;
+            *) echo "::error::VITE_API_BASE must be a public https:// URL."; exit 1 ;;
+          esac
+          case "$VITE_API_BASE" in
+            */docs|*/docs/|*/analyze|*/analyze/) echo "::error::Use the API app base URL, not an endpoint."; exit 1 ;;
+          esac
+
+      - name: Check deployed API is usable without credentials
+        run: |
+          set -euo pipefail
+          RESULT=$(curl -fsSL --max-time 20 "$VITE_API_BASE" || true)
+          echo "$RESULT" | jq -e '.name == "CivicWatch" and .status == "ready"' >/dev/null || {
+            echo "::error::Public API root did not return the expected CivicWatch JSON. Verify sharing permissions and API URL.";
+            exit 1;
+          }
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.APP_DIR }}/package-lock.json
+
+      - name: Build frontend
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run lint
+          npm run build
+          test -f dist/index.html
+
+      - name: Check Connect publishing credentials exist
+        env:
+          CONNECT_SERVER: ${{ secrets.CONNECT_SERVER }}
+          CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
+        run: |
+          [ -n "$CONNECT_SERVER" ] || { echo "::error::Repository secret CONNECT_SERVER is missing."; exit 1; }
+          [ -n "$CONNECT_API_KEY" ] || { echo "::error::Repository secret CONNECT_API_KEY is missing."; exit 1; }
+
+      - name: Publish built site
+        id: publish
+        timeout-minutes: 10
+        env:
+          CONNECT_SERVER: ${{ secrets.CONNECT_SERVER }}
+          CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
+          BUNDLE_DIR: ${{ env.APP_DIR }}/dist
+          POLL_BUDGET_SECONDS: '120'
+        run: bash .github/scripts/connect-publish-static-async.sh
+
+      - name: Check site response
+        env:
+          CONTENT_URL: ${{ steps.publish.outputs.content_url }}
+        run: |
+          set -euo pipefail
+          [ -n "$CONTENT_URL" ] || { echo "::error::Publisher did not return a site URL."; exit 1; }
+          CODE=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-time 20 "$CONTENT_URL" || true)
+          [ "$CODE" = "200" ] || { echo "::error::Dashboard returned HTTP $CODE anonymously."; exit 1; }
+          echo "Dashboard available: $CONTENT_URL"
