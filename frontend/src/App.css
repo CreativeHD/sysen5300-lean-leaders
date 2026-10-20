@@ -157,4 +157,58 @@ section h2 {
 select {
   margin: 10px 10px 25px 0;
 }
+header{
+  background: #1b4332;
+  color: white;
+}
+header h1,
+  header p{
+    color: white;
+  }
+h2,
+  .summary h3,
+.chart-explanation h3 {
+  color: #1b4332;
+}
+button {
+  background: #2d6a4f;
+  color: white;
+}
 
+button:hover:not(:disabled) {
+  background: #1b4332;
+}
+.summary div {
+  background: #edf5ef;
+}
+.chart-explanation {
+    margin-top: 25px;
+  padding: 20px;
+  background: #f1f8f3;
+  border-left: 4px solid #40916c;
+  border-radius: 6px;
+}
+.chart-explanation h3 {
+  margin-top: 0;
+}
+
+.chart-explanation p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.chart-note {
+  color: #52665a;
+  font-style: italic;
+}
+
+.alert-label {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #fff0e5;
+  color: #9a4b16;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+}

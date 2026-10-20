@@ -117,25 +117,25 @@ function App() {
                 <Line
                   dataKey="rate_per_1000"
                   name="Observed Rate"
-                  stroke="#2563eb"
+                  stroke="#2d6a4f"
                   dot={false}
                 />
                 <Line
                   dataKey="center_per_1000"
                   name="Center Line"
-                  stroke="#16a34a"
+                  stroke="#74a892"
                   dot={false}
                 />
                 <Line
                   dataKey="ucl_per_1000"
                   name="UCL"
-                  stroke="#dc2626"
+                  stroke="#d97745"
                   dot={false}
                 />
                 <Line
                   dataKey="lcl_per_1000"
                   name="LCL"
-                  stroke="#9333ea"
+                  stroke="#8a9a5b"
                   dot={false}
                 />
               </LineChart>
