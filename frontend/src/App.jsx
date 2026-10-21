@@ -59,28 +59,6 @@ function App() {
     row => row.phase === 'monitoring' && row.signal
   )
 
-  const sdData = [...new Set(observations.map(row => row.zone_id))]
-  .map(zone => {
-    const rates = observations
-      .filter(row =>
-        row.zone_id === zone &&
-        row.phase === 'monitoring' &&
-        row.vehicles_observed > 0
-      )
-      .map(row => row.rate_per_1000)
-
-      const mean = rates.reduce((a, b) => a + b, 0) / rates.length
-
-    const sd = rates.length > 1
-      ? Math.sqrt(
-          rates.reduce((sum, rate) => sum + (rate - mean) ** 2, 0)
-          / (rates.length - 1)
-        )
-      : 0
-
-    return { zone, sd }
-  })
-
   // Select the observations for one zone and shift
   const chartData = observations
     .filter(row => row.zone_id === zone && row.shift === shift)
