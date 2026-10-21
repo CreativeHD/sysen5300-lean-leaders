@@ -1,31 +1,41 @@
-# CivicWatch H-02 validation preview
+# CivicWatch synthetic-dataset validation (H-02)
 
-All checks **PASSED** (before GitHub commit).
+The three demonstration CSVs were generated and validated with deterministic scripts. The dataset-level checks below passed during H-02. Since that initial validation, the complete Python application and public dashboard have also been built, tested, and deployed.
 
-- Three CSV files; exactly **280** data rows and **9** columns per CSV.
-- Each contains **168 baseline rows**, **112 monitoring rows**, **4 zones**, and **2 shifts** across 35 dates.
-- Required columns populated, unique zone/date/shift keys, valid integers and phase labels.
-- All baseline and non-intervention observations are identical across the three scenarios.
-- Every record is explicitly synthetic; the scenario authorization reference is fictional.
-- Generator rerun yields **byte-for-byte identical CSVs**.
-- Hand calculation from the project SPEC: baseline center = 20 stops/1,000; UCL = 62.4264/1,000; 7 stops/100 vehicles gives 70/1,000 and exceeds the upper limit.
+## Dataset construction checks
 
-## Target scenario: Zone_C evening, September 25–29
+- Exactly **3 CSVs**, each with **280 data rows** and **9 columns**.
+- Each file has **168 baseline rows**, **112 monitoring rows**, **4 zones**, **2 shifts**, and 35 dates.
+- Required columns are populated; `(date, zone_id, shift)` keys are unique; integer counts and phase labels are valid.
+- All shared baseline and non-intervention observations are identical across the scenarios.
+- Every row is explicitly synthetic, and the scenario authorization reference is fictional.
+- Re-running the generator with the tested compatible environment yields byte-for-byte identical CSVs.
+- Known-answer calculation: the baseline center is **20 stops per 1,000 vehicles**, UCL is **62.4264**, and a monitoring rate of **70** exceeds the UCL.
 
-| File | Vehicles observed | Stops observed | Stops/1,000 vehicles | Out-of-control target periods |
-|---|---:|---:|---:|---:|
-| baseline.csv | 4,425 | 45 | 10.17 | 0/5 |
-| ticket_blitz.csv | 4,425 | 242 | 54.69 | 5/5 |
-| traffic_surge.csv | 8,850 | 90 | 10.17 | 0/5 |
+## Target scenario: Zone_C evening, September 25–29, 2026
 
-Shared Zone_C evening baseline: **10.77 stops per 1,000 vehicles**.
+| File | Vehicles observed | Stops observed | Stops per 1,000 vehicles | Target observations above limits |
+| --- | ---: | ---: | ---: | ---: |
+| `baseline.csv` | 4,425 | 45 | 10.17 | **0/5** |
+| `ticket_blitz.csv` | 4,425 | 242 | 54.69 | **5/5** |
+| `traffic_surge.csv` | 8,850 | 90 | 10.17 | **0/5** |
 
-## All monitored observations, including unrelated random alerts
+The shared Zone_C evening historical center line is approximately **10.77 stops per 1,000 vehicles**.
 
-- baseline.csv: **1** SPC limit exceedance(s): [('2026-09-24', 'Zone_A', 'evening', 'upper')].
-- ticket_blitz.csv: **6** SPC limit exceedance(s): five injected blitz periods plus the shared incidental alert.
-- traffic_surge.csv: **1** SPC limit exceedance(s): the same shared incidental alert only.
+## Monitoring alerts across all groups
 
-A baseline dataset can sometimes produce a false SPC signal; a stable generating process does not guarantee zero flagged observations in a finite sample.
+| Dataset | Monitoring signals | Explanation |
+| --- | ---: | --- |
+| `baseline.csv` | **1** | Incidental upper-limit exceedance on September 24 in Zone_A evening |
+| `ticket_blitz.csv` | **6** | The same incidental signal, plus five deliberately planted Zone_C evening blitz signals |
+| `traffic_surge.csv` | **1** | The same incidental signal; no alerts on the five target surge evenings |
 
-*The full FastAPI application, formal tests, and deployment have not been built or tested. This report validates only the dataset previews and their expected statistical behavior.*
+The one shared chance signal demonstrates that a stable generating process can still produce an isolated SPC limit exceedance. A statistical alert requires review of data quality and context; it is **not** evidence of misconduct.
+
+## End-to-end verification completed after H-02
+
+- The team's clean-checkout Python verification reported **30 passing tests** (17 statistical tests and 13 API tests).
+- The live FastAPI backend returned the expected monitoring totals **1 / 6 / 1** for the three CSVs.
+- The live React dashboard was tested with each CSV on **October 21, 2026**, reproducing **280 observations**, **8 groups**, and the expected **1 / 6 / 1 monitoring alert counts**. These outcomes are illustrated in [`../demo/README.md`](../demo/README.md) with screenshots captured from the public deployment.
+
+The generator, original inputs, statistical code, and tests are available in this public repository. For the variable dictionary, unit definitions, synthetic-data assumptions, and collection requirements for real field data, see [`README.md`](README.md).

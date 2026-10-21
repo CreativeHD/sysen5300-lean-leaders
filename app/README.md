@@ -1,44 +1,64 @@
 # CivicWatch API (H-04)
 
-This is CivicWatch's first working application layer. All statistics are computed by the unchanged `qc.py` module. Only synthetic example data are provided; a statistical signal is not evidence of unlawful enforcement.
+CivicWatch's FastAPI backend validates a user-uploaded CSV and delegates all statistical calculations to [`qc.py`](qc.py). It is **deployed and publicly accessible** on the course Posit Connect server. All supplied example datasets are synthetic, and a statistical signal is not evidence of unlawful enforcement.
+
+**Public API:** https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/
+
+**Interactive API docs:** https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/docs
+
+**Public dashboard:** https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/
 
 ## Install (Windows PowerShell)
 
-From the repository root:
+From the repository root, using Python 3.12:
 
 ```powershell
-py -m pip install -r app/requirements-dev.txt
+py -3.12 -m pip install -r app/requirements-dev.txt
 ```
 
-## Launch (Windows PowerShell)
+## Launch locally (Windows PowerShell)
 
 ```powershell
 cd app
-py -m uvicorn app:app --host 127.0.0.1 --port 8000
+py -3.12 -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000/docs` and expand `POST /analyze`, click **Try it out**, choose `data/baseline.csv` from your checkout, then click **Execute**. Repeat with the two other CSVs.
+Open `http://127.0.0.1:8000/docs` and expand **POST /analyze**, click **Try it out**, choose `data/baseline.csv` from your checkout, then click **Execute**. Repeat with the other two CSVs. In Bash, after installing dependencies, you can run `bash app/testme.sh` from the repository root.
 
-For Bash, after installing dependencies run `bash app/testme.sh` from the repository root.
+## API endpoints and inputs
 
-## Endpoints
+- `GET /`: health and service-status information.
+- `GET /docs`: interactive OpenAPI documentation.
+- `POST /analyze`: multipart CSV upload with the form field named `file`. Returns the results of `qc.u_chart`, including baseline group rates, observed rates, center lines, UCL/LCL values, monitoring signal flags, warnings, and summary counts.
 
-- `GET /`: health/status information.
-- `GET /docs`: interactive API documentation.
-- `POST /analyze`: multipart CSV upload (`file` field). Returns the JSON structure produced by `qc.u_chart`: baseline group rates, rates and u-chart control limits for each observation, signal flags, assumptions/warnings, and a summary.
+The endpoint accepts a UTF-8 `.csv` file up to **5 MB**. Invalid or insufficient observations return HTTP **422** with an explanatory `detail`; oversized files return HTTP **413**.
 
-The upload accepts a UTF-8 `.csv` up to 5 MB. Invalid or insufficient measurements receive an HTTP 422 response with an explanatory `detail`; oversized files receive HTTP 413. Required columns are `date`, `zone_id`, `shift`, `vehicles_observed`, `stops_observed`, and `phase`. Optional context is documented in `data/README.md`.
+**Required CSV columns:** `date`, `zone_id`, `shift`, `vehicles_observed`, `stops_observed`, `phase`.
 
-Expected monitoring alerts: `baseline.csv` = **1**, `ticket_blitz.csv` = **6**, `traffic_surge.csv` = **1**. The one common incidental signal is recorded in `data/VALIDATION.md`.
+**Optional CSV columns:** `authorization_status`, `policy_reference`, `source_type`. See [`../data/README.md`](../data/README.md) for the complete codebook. Optional policy context is passed through in API results; the dashboard does not determine legal authorization.
 
-## Verify
+## Test datasets and verified results
+
+| Dataset | Rows | Zone/shift groups | Monitoring alerts |
+| --- | ---: | ---: | ---: |
+| [`baseline.csv`](../data/baseline.csv) | 280 | 8 | **1** |
+| [`ticket_blitz.csv`](../data/ticket_blitz.csv) | 280 | 8 | **6** |
+| [`traffic_surge.csv`](../data/traffic_surge.csv) | 280 | 8 | **1** |
+
+The common incidental signal is documented in [`../data/VALIDATION.md`](../data/VALIDATION.md). The five planted blitz signals occur in Zone_C evening, September 25–29, 2026. The five targeted traffic-surge observations do not exceed their exposure-adjusted limits. The team verified all three datasets through the deployed dashboard on October 21, 2026.
+
+## Verify from a checkout
 
 From the repository root:
 
 ```powershell
-py -m pytest tests app/test_app.py -q
+py -3.12 -m pytest tests app/test_app.py -q
 ```
 
-## Deployment (later H-06)
+The team previously reported **30 passing Python tests**: 17 statistical tests and 13 API tests. See [`../demo/README.md`](../demo/README.md) for a browser-based, screenshot-illustrated demonstration.
 
-`manifestme.sh` and `deployme.sh` preserve the instructor's Posit Connect workflow; actual deployment is **not yet configured or tested**. Never commit credentials. The frontend and final demo are separate tasks.
+## Deployment and security
+
+The FastAPI service is deployed to Posit Connect as a **separate application** from the React dashboard. Deployment scripts are [`manifestme.sh`](manifestme.sh) and [`deployme.sh`](deployme.sh); `manifest.json` and `.python-version` record the Connect-compatible environment. The team has already validated the public API and its example dataset results.
+
+**Do not redeploy over a teammate's content without coordinating on [GitHub Issue #1](https://github.com/CreativeHD/sysen5300-lean-leaders/issues/1).** Publishing credentials belong only in GitHub Actions secrets or Git-ignored local environment files. Never commit an API key, and exclude `.env` and `.venv` from deployment bundles.

@@ -1,19 +1,24 @@
 # CivicWatch React dashboard
 
-CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The web dashboard uploads a CSV to the team's FastAPI backend and displays group charts and monitoring alerts. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
+CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The React interface uploads a CSV to the team's FastAPI backend and displays group charts, monitoring alerts, and descriptive comparisons. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
+
+**Public dashboard:** https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/
+
+**Public analysis API:** https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/
 
 ## Local development
 
-Requires Node.js 22+ and the Python FastAPI backend, which runs on `http://127.0.0.1:8000`.
+Requires Node.js 22+ and the Python 3.12 FastAPI backend, which runs on `http://127.0.0.1:8000` locally.
 
-From the repo root, start the API in one terminal:
+From the repository root, start the API in one Windows PowerShell terminal:
 
 ```powershell
 cd app
-py -m uvicorn app:app --host 127.0.0.1 --port 8000
+py -3.12 -m pip install -r requirements-dev.txt
+py -3.12 -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-In a second terminal:
+In a **second** terminal, from the repository root:
 
 ```powershell
 cd frontend
@@ -21,13 +26,13 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open the Vite URL shown in the terminal (typically `http://localhost:5173/`). By default, Vite proxies `/analyze` to the locally running API. If you want to exercise a deployed API locally, create a Git-ignored `frontend/.env.local` containing:
+Open the Vite URL shown in the terminal, typically `http://localhost:5173/`. By default, Vite proxies `/analyze` requests to the locally running API. To exercise the **deployed** API from a local frontend, create a Git-ignored `frontend/.env.local` containing:
 
-```
+```text
 VITE_API_BASE=https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/
 ```
 
-Restart Vite after changing `.env.local`. `VITE_API_BASE` is a **public app URL**, not an API key. Never put credentials in Vite environment variables.
+Restart Vite after changing `.env.local`. `VITE_API_BASE` is a **public application URL**, never an API key. Do not put credentials in Vite environment variables.
 
 ## Build and lint
 
@@ -38,33 +43,28 @@ npm.cmd run lint
 npm.cmd run build
 ```
 
-Vite outputs a static `dist/` directory. `base: './'` in `vite.config.js` keeps asset URLs relative so the app works at Posit Connect's `/content/<id>/` URL.
+Vite outputs a static `dist/` directory. `base: './'` in `vite.config.js` keeps asset URLs relative so the app works at a Posit Connect `/content/<id>/` address. The production frontend builds with the published API URL set as `VITE_API_BASE`.
 
-## Deploy to Posit Connect
+## Deployment status
 
-The API and this static frontend are separate content items on Posit Connect. The existing public API is:
+The React frontend and FastAPI backend are **separate Posit Connect content items**. The dashboard is **already published**, responds without a login, and passed GitHub's final public-access check. All three sample datasets were also verified through its public user interface on October 21, 2026.
 
-https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/
+The workflow is [`.github/workflows/deploy-react-static.yml`](../.github/workflows/deploy-react-static.yml). It uses the instructor's static publishing scripts and the repository's `CONNECT_SERVER` and `CONNECT_API_KEY` **GitHub Actions secrets**. Do not store or print those credentials in the source code or documentation.
 
-GitHub Actions workflow `.github/workflows/deploy-react-static.yml` builds and publishes `frontend/dist/` using the instructor's scripts from [connect-publish](https://github.com/timothyfraser/sixsigmahackathon/tree/main/.claude/skills/connect-publish). Its `VITE_API_BASE` build variable points to the published API.
+**Automatic publishing is intentionally paused.** The workflow currently has `workflow_dispatch` but no `push` trigger, so pushing a frontend change does not update the deployed dashboard. Publishing any further frontend changes must be coordinated with the team and performed by a repository maintainer using an available manual workflow mechanism. Since the workflow lives on `hackathon-civicwatch` rather than default `main`, GitHub's normal **Run workflow** button may not appear. Do not assume the live dashboard has changed just because GitHub source files have changed.
 
-Before triggering the workflow, a repository administrator must add **two GitHub Actions secrets** in Settings > Secrets and variables > Actions:
+After any redeployment, confirm the dashboard is still accessible anonymously and upload all three CSVs. Do not create a second content item or overwrite the separately managed backend by accident.
 
-- `CONNECT_SERVER` = `https://connect.systems-apps.com`
-- `CONNECT_API_KEY` = a Posit Connect publisher key authorized to deploy the team's frontend content
+## Acceptance test on the live dashboard
 
-Do not commit or share the key. The workflow runs for frontend changes on `hackathon-civicwatch` and can later be updated to deploy from `main` after team coordination. If the professor needs anonymous access, set the published frontend's sharing permissions in Posit Connect to **Anyone, no login** and check from an incognito window.
-
-## Acceptance test after deployment
-
-From the repo's `data/` folder, upload each CSV through the public dashboard:
+From the repository's [`data/`](../data/) folder, download and upload each CSV:
 
 | Dataset | Observations | Groups | Monitoring alerts |
 | --- | ---: | ---: | ---: |
-| `baseline.csv` | 280 | 8 | 1 |
-| `ticket_blitz.csv` | 280 | 8 | 6 |
-| `traffic_surge.csv` | 280 | 8 | 1 |
+| `baseline.csv` | 280 | 8 | **1** |
+| `ticket_blitz.csv` | 280 | 8 | **6** |
+| `traffic_surge.csv` | 280 | 8 | **1** |
 
-For `ticket_blitz.csv`, Zone_C evening contains five planted exceedances on September 25 through 29. For `traffic_surge.csv`, the changing control limits should accommodate doubled traffic volume without false alerts on those five target days.
+For `ticket_blitz.csv`, select **Zone_C, evening** and inspect five planted upper-limit exceedances on September 25–29. For `traffic_surge.csv`, choose the same group and see changing control limits without signals on those five target days.
 
-A successful CI publish only establishes that a page responds. Perform the browser upload checks with the local API stopped before calling the tool fully deployed.
+A successful CI run alone does not prove statistical behavior. For the illustrated demonstration and measured expected results, see [`../demo/README.md`](../demo/README.md).
