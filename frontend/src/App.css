@@ -212,3 +212,74 @@ button:hover:not(:disabled) {
   font-size: 13px;
   font-weight: 600;
 }
+
+.workflow {
+  text-align: center;
+  background: #edf5ef;
+}
+
+.workflow p {
+  line-height: 1.8;
+}
+
+.next-steps {
+  text-align: left;
+  padding: 30px 40px;
+}
+
+.next-steps h2 {
+  text-align: center;
+  color: #1b4332;
+  margin-bottom: 20px;
+}
+
+.next-steps ol {
+  display: table;
+  margin: 20px auto;
+  padding-left: 30px;
+  line-height: 2;
+  text-align: left;
+  list-style-position: outside;
+}
+
+.next-steps > p {
+  text-align: center;
+}
+
+.next-steps li {
+  text-align: left;
+  padding-left: 8px;
+}
+
+.next-steps li::marker {
+  color: #2d6a4f;
+  font-weight: bold;
+}
+
+.next-steps-note {
+  font-size: 14px;
+  color: #666;
+  margin-top: 25px;
+}
+
+.dashboard-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.dashboard-row section {
+  min-width: 0;
+  margin-top: 20px;
+}
+
+.dashboard-row .recharts-responsive-container {
+  max-width: 100%;
+}
+
+@media (max-width: 800px) {
+  .dashboard-row {
+    grid-template-columns: 1fr;
+  }
+}

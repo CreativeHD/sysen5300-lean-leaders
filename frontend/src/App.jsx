@@ -90,8 +90,23 @@ function App() {
     <div className="container">
       <header>
         <h1>CivicWatch</h1>
-        <p>Six Sigma Statistical Process Control Dashboard</p>
+        <h3>Community Traffic Enforcement Monitoring</h3>
+        <p>CivicWatch helps community orgranizations track traffic enforcement activity, compare patterns, and identify unusual traffic changes.</p>
       </header>
+      
+      <div className="dashboard-row">
+      <section className="workflow">
+        <h2>How CivicWatch Works</h2>
+        <p>
+          1. Upload - Provide Traffic Observation and Enforcement Data.
+        </p>
+        <p>
+          2. Analyze - Explore Enforcement Rates and Detect Unusual Patterns.
+        </p>
+        <p>
+          3. Review - Identify Observations That May Need Further Review.
+        </p>
+      </section>
 
       <section>
         <h2>1. Upload Dataset</h2>
@@ -109,6 +124,7 @@ function App() {
         </button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </section>
+      </div>
 
       {results && (
         <>
@@ -145,7 +161,7 @@ function App() {
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-
+            <div className="dashboard-row">
             <section>
               <h2>Enforcement Rates by Zone</h2>
               <p>Monitoring Period Stops per 1,000 Observed Vehicles.</p>
@@ -175,7 +191,8 @@ function App() {
                 </BarChart>
               </ResponsiveContainer>
             </section>
-
+            </div>
+            
             <section>
               <h2>Standard Deviation by Zone</h2>
               <p>Variation in Monitoring Stop Rates per 1,000 Vehicles.</p>
@@ -264,11 +281,38 @@ function App() {
               </table>
             )}
           </section>
-        </>
-      )}
 
-      <footer>
-        <p>
+          <section className="next-steps">
+            <h2>5. Recommended Next Steps</h2>
+            {alerts.length > 0 ? (
+              <>
+                <p>
+                  Unusual enforcement patterns were detected. 
+                  Consider the following actions:
+                  </p>
+                <ol>
+                  <li>Review flagged dates, zones, and shifts.</li>
+                  <li>Verify traffic counts and enforcement data.</li>
+                  <li>Compare findings with available policy or operational context.</li>
+                  <li>Document findings and determine if further investigation is needed.</li>
+                </ol>
+              </>
+            ) : (
+              <p>
+                No unusual patterns were flagged.
+              </p>
+            )}
+
+            <p className="next-steps-note">
+                Statistical alerts indicate special cause variation, 
+                not proof of misconduct.
+            </p>
+                  </section>
+                </>
+              )}
+
+              <footer>
+                <p>
           Statistical alerts indicate unusual process variation,
           not proof of unlawful enforcement.
         </p>
