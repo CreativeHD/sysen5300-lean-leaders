@@ -2,14 +2,9 @@
 # Deploys only the React site; never modifies the already deployed FastAPI service.
 name: Deploy CivicWatch React to Posit Connect
 
+# Temporarily paused automatic deployment after the public access check returned 401.
+# Re-enable push triggers only once Connect sharing is set to Anyone, no login.
 on:
-  push:
-    branches: [hackathon-civicwatch]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/deploy-react-static.yml'
-      - '.github/scripts/connect-publish-static-async.sh'
-      - '.github/scripts/connect-publish-async.sh'
   workflow_dispatch:
 
 permissions:
