@@ -1,6 +1,7 @@
+import Plot from 'react-plotly.js'
 import { useState } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis,
+  LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
 import { analyzeCsv } from './api'
@@ -35,11 +36,50 @@ function App() {
 
   const observations = results?.observations || []
   const groups = results?.groups || []
+  const zoneData = [...new Set(observations.map(row => row.zone_id))]
+.map(zone => {
+  const rows = observations.filter(row => row.zone_id === zone)
+   const rate = phase => {
+    const data = rows.filter(row => row.phase === phase)
+    const stops = data.reduce((sum, row) => sum + row.stops_observed, 0)
+    const vehicles = data.reduce((sum, row) => sum + row.vehicles_observed, 0)
+    return vehicles ? (stops/vehicles) * 1000 : 0
+   }
+   return {
+    zone,
+    rate: rate('monitoring'),
+    baseline: rate('baseline'),
+    monitoring: rate('monitoring'),
+    alerts: rows.filter(row => row.phase === 'monitoring' && row.signal).length
+   }
+  })
 
   // Monitoring alerts are observations outside control limits
   const alerts = observations.filter(
     row => row.phase === 'monitoring' && row.signal
   )
+
+  const sdData = [...new Set(observations.map(row => row.zone_id))]
+  .map(zone => {
+    const rates = observations
+      .filter(row =>
+        row.zone_id === zone &&
+        row.phase === 'monitoring' &&
+        row.vehicles_observed > 0
+      )
+      .map(row => row.rate_per_1000)
+
+      const mean = rates.reduce((a, b) => a + b, 0) / rates.length
+
+    const sd = rates.length > 1
+      ? Math.sqrt(
+          rates.reduce((sum, rate) => sum + (rate - mean) ** 2, 0)
+          / (rates.length - 1)
+        )
+      : 0
+
+    return { zone, sd }
+  })
 
   // Select the observations for one zone and shift
   const chartData = observations
@@ -105,6 +145,60 @@ function App() {
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
+
+            <section>
+              <h2>Enforcement Rates by Zone</h2>
+              <p>Monitoring Period Stops per 1,000 Observed Vehicles.</p>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={zoneData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="zone" />
+                  <YAxis />
+                  <Tooltip formatter={value => Number(value).toFixed(2)} />
+                  <Bar dataKey="rate" name="Stop Rate" fill="#2d6a4f" />
+                </BarChart>
+              </ResponsiveContainer>
+            </section>
+            
+            <section>
+              <h2>Monitoring Alerts by Zone</h2>
+              <p>Number of Monitoring Observations Outside Statistical Control Limits.</p>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={zoneData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="zone" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="alerts" name="Alerts" fill="#d97745" />
+                </BarChart>
+              </ResponsiveContainer>
+            </section>
+
+            <section>
+              <h2>Standard Deviation by Zone</h2>
+              <p>Variation in Monitoring Stop Rates per 1,000 Vehicles.</p>
+
+              <Plot
+                data={[...new Set(observations.map(row => row.zone_id))].map(zone => ({
+                  y: observations
+                    .filter(row => row.zone_id === zone && row.phase === 'monitoring' && row.vehicles_observed > 0)
+                    .map(row => row.rate_per_1000),
+                  type: 'box',
+                  name: zone,
+                  marker: { color: '#40916c' },
+                  boxpoints: 'outliers'
+                }))}
+                layout={{
+                  height: 350,
+                  yaxis: { title: 'Stops per 1,000 vehicles' },
+                  showlegend: false
+                }}
+                style={{ width: '100%' }}
+                useResizeHandler
+              />
+            </section>
 
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData}>
