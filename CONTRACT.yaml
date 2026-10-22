@@ -22,7 +22,7 @@
 # Delete the paths you do not use.
 
 spec: SPEC.md
-updated: ""
+updated: "2026-10-21"
 
 tasks:
   - id: H-01
@@ -74,8 +74,8 @@ tasks:
   - id: H-04
     title: Working tool - one demo copied to app/ and wired to the H-03 function
     points: "25 - Tool Implementation: an effective, working tool (does it run?)"
-    status: in_progress
-    owner: "CivicWatch API agent"
+    status: done
+    owner: "Lean Leaders"
     started_at: "2026-10-17"
     owns: ["app/"]
     notes: >
@@ -86,28 +86,28 @@ tasks:
       The testme script in app/ starts the tool with one command, and a call
       on one data/ file (endpoint, function call or app upload) returns the
       same numbers as the H-03 known-answer test.
-    result: ""
+    result: "30 pytest cases pass from a clean checkout; all 3 data/ CSVs through POST /analyze give 1 / 6 / 1 monitoring signals locally and on the deployed API."
 
   - id: H-05
     title: Demonstration of the tool on every test dataset
     points: "10 - Tool Design: a clear demonstration of the tool, using test datasets"
-    status: todo
-    owner: ""
-    started_at: ""
-    owns: ["demo/", "app/frontend/"]
+    status: done
+    owner: "Lean Leaders"
+    started_at: "2026-10-19"
+    owns: ["demo/", "frontend/"]
     definition_of_done: >
       demo/README.md walks through each data/ CSV with the exact command or
       URL to run, the numbers or chart the tool shows, and a one-line "how to
       read this"; a teammate who did not write it follows it and gets the same
       numbers.
-    result: ""
+    result: "demo/README.md walks through all 3 CSVs with expected counts (1 / 6 / 1), screenshots from the live dashboard and how-to-read notes; numbers checked against data/ and the live API on 2026-10-21."
 
   - id: H-06
     title: Deploy to the course Posit Connect server
     points: "protects the 25 working-tool points - judges must be able to open it"
-    status: todo
-    owner: ""
-    started_at: ""
+    status: done
+    owner: "Lean Leaders"
+    started_at: "2026-10-17"
     owns: [".github/workflows/", ".github/scripts/", "app/manifest.json", "app/.python-version"]
     notes: >
       Load the connect-publish skill. Copy ONE workflow for your stack from
@@ -120,14 +120,14 @@ tasks:
     definition_of_done: >
       The workflow run is green, and the public URL answers HTTP 200 from a
       logged-out browser and returns the H-03 numbers for one test dataset.
-    result: ""
+    result: "API https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/ and dashboard https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/ both answer HTTP 200 logged out; deploy workflow run green on 9c9ae38; push trigger since paused (7981716), manual workflow_dispatch only."
 
   - id: H-07
     title: README and function documentation
     points: "10 - Tool Documentation: excellent, easy-to-follow documentation"
-    status: todo
-    owner: ""
-    started_at: ""
+    status: done
+    owner: "Lean Leaders"
+    started_at: "2026-10-21"
     owns: ["README.md", "app/README.md"]
     notes: >
       Replace the hackathon README.md with your tool's README; the event
@@ -137,7 +137,7 @@ tasks:
       how each function or endpoint works, how to run it in one command, the
       live URL, and links demo/README.md. A teammate who did not write the
       code follows it from a fresh clone and it works.
-    result: ""
+    result: "Root README, app/README.md and frontend/README.md rewritten (inputs, method, live URLs, run steps). Fresh clone verified 2026-10-21: 30 tests pass and app/testme.sh starts the API; frontend npm build not yet verified by a teammate."
 
   - id: H-08
     title: Reproducible public repo, submitted on Devpost
