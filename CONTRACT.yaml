@@ -22,7 +22,7 @@
 # Delete the paths you do not use.
 
 spec: SPEC.md
-updated: "2026-10-21"
+updated: "2026-10-22"
 
 tasks:
   - id: H-01
@@ -35,7 +35,8 @@ tasks:
     notes: >
       Do this together, out loud, right after kickoff. The prompts are in
       docs/prompts.md once the event starts. Keep inputs to what the user can
-      actually measure.
+      actually measure. SPEC.md is filled in, but final team confirmation of
+      the method and scope is still pending.
     definition_of_done: >
       grep -c "FILL IN[.,]" SPEC.md prints 0 (it counts only the blanks,
       not the instructions at the top), and every teammate can say the
@@ -120,7 +121,7 @@ tasks:
     definition_of_done: >
       The workflow run is green, and the public URL answers HTTP 200 from a
       logged-out browser and returns the H-03 numbers for one test dataset.
-    result: "API https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/ and dashboard https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/ both answer HTTP 200 logged out; deploy workflow run green on 9c9ae38; push trigger since paused (7981716), manual workflow_dispatch only."
+    result: "Public FastAPI API and React dashboard return HTTP 200 without login. Manual main-branch deployment run 39804643797 passed all GitHub Actions steps on 2026-10-22, including frontend lint/build and site response. The team verified 1 / 6 / 1 alerts in the deployed dashboard. Automatic push deployments remain disabled."
 
   - id: H-07
     title: README and function documentation
@@ -137,7 +138,7 @@ tasks:
       how each function or endpoint works, how to run it in one command, the
       live URL, and links demo/README.md. A teammate who did not write the
       code follows it from a fresh clone and it works.
-    result: "Root README, app/README.md and frontend/README.md rewritten (inputs, method, live URLs, run steps). Fresh clone verified 2026-10-21: 30 tests pass and app/testme.sh starts the API; frontend npm build not yet verified by a teammate."
+    result: "Root, app, and frontend READMEs describe inputs, methods, live URLs, and reproduction. Teammate verification on 2026-10-21 reported 30 Python tests passing, app/testme.sh starting the API, and frontend npm ci, lint, and build passing. The 2026-10-22 manual deployment also passed lint/build."
 
   - id: H-08
     title: Reproducible public repo, submitted on Devpost
