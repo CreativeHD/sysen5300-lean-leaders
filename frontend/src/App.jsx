@@ -254,8 +254,8 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
             </div>
 
             <section>
-              <h2>Standard Deviation by Zone</h2>
-              <p>Variation in Monitoring Stop Rates per 1,000 Vehicles.</p>
+              <h2>Distribution of Monitoring Rates by Zone</h2>
+              <p>Box-and-whisker distribution of monitoring stop rates per 1,000 vehicles.</p>
 
               <Plot
                 data={[...new Set(observations.map(row => row.zone_id))].map(zone => ({
