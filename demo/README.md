@@ -6,12 +6,12 @@ This walkthrough demonstrates CivicWatch's baseline-only Poisson u-chart using t
 
 **Live application:** [Open the CivicWatch dashboard on Posit Connect](https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/).
 
-**Data downloads:** [`baseline.csv`](../data/baseline.csv), [`ticket_blitz.csv`](../data/ticket_blitz.csv), and [`traffic_surge.csv`](../data/traffic_surge.csv). Open a CSV in GitHub and choose **Download raw file**. The [dataset codebook](../data/README.md) explains each column.
+**Data downloads:** [`baseline.csv`](../data/baseline.csv), [`ticket_blitz.csv`](../data/ticket_blitz.csv), and [`traffic_surge.csv`](../data/traffic_surge.csv). Open a CSV in GitHub and choose **Download raw file**. The [dataset codebook](../data/README.md) explains each column. The one-click dashboard samples are identical byte-for-byte copies of these canonical CSV files.
 
 ## Instructions for the reviewer
 
 1. Open the public dashboard in a desktop browser. It should load without a Posit Connect login.
-2. Use **Choose File** to select one of the downloaded CSVs, then click **Analyze Dataset**.
+2. Click **Baseline · 1 signal**, **Ticket blitz · 6 signals**, or **Traffic surge · 1 signal** under **Or explore a built-in example**. The application loads that CSV and sends it through the normal FastAPI analysis endpoint automatically. You can alternatively choose an uploaded CSV and click **Analyze Dataset**.
 3. In **What the observations show**, confirm the total of 280 observation periods and compare the indicated monitoring alerts with the expected number below. The dataset contains eight zone/shift groups.
 4. Read **Baseline quality and cautions**. On all three datasets, the shared historical baseline generates screening warnings for Zone_B evening (possible overdispersion, 1.738) and Zone_C evening (possible underdispersion, 0.448). These are not formal stability tests.
 5. In **Control Chart**, select the specified zone and shift. The dashed vertical line marks monitoring start; highlighted orange points mark signals. Inspect observed rate, baseline center, upper control limit (UCL), and lower control limit (LCL).
