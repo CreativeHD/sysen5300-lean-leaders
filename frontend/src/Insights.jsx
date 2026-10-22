@@ -27,7 +27,7 @@ export function OverviewInsights({ results }) {
 
   return (
     <div className="insight-stack">
-      <section className="insight-section insight-overview" aria-labelledby="insight-heading">
+      <section id="civicwatch-overview" className="insight-section insight-overview" aria-labelledby="insight-heading">
         <div className="insight-section__heading">
           <div>
             <span className="insight-eyebrow">QUANTITATIVE SUMMARY</span>
@@ -59,7 +59,7 @@ export function OverviewInsights({ results }) {
         </p>
       </section>
 
-      <section className="insight-section" aria-labelledby="quality-heading">
+      <section id="civicwatch-quality" className="insight-section" aria-labelledby="quality-heading">
         <div className="insight-section__heading">
           <div>
             <span className="insight-eyebrow">MODEL ASSUMPTIONS</span>
@@ -96,7 +96,7 @@ export function OverviewInsights({ results }) {
         </div>
       </section>
 
-      <section className="insight-section" aria-labelledby="group-heading">
+      <section id="civicwatch-comparisons" className="insight-section" aria-labelledby="group-heading">
         <div className="insight-section__heading">
           <div>
             <span className="insight-eyebrow">COMPARABLE PROCESSES</span>
@@ -158,7 +158,7 @@ export function InvestigationDetails({ results, onInspect }) {
 
   return (
     <div className="insight-stack">
-      <section className="insight-section" aria-labelledby="evidence-heading">
+      <section id="civicwatch-investigations" className="insight-section" aria-labelledby="evidence-heading">
         <div className="insight-section__heading">
           <div>
             <span className="insight-eyebrow">FIELD REVIEW</span>
@@ -219,7 +219,7 @@ export function InvestigationDetails({ results, onInspect }) {
           Control limits are statistical thresholds, not policy rules, probability statements about wrongdoing, or specification limits.
         </p>
       </section>
-      <section className="insight-section insight-methods" aria-labelledby="method-heading">
+      <section id="civicwatch-methods" className="insight-section insight-methods" aria-labelledby="method-heading">
         <span className="insight-eyebrow">SIX SIGMA INTERPRETATION</span>
         <h2 id="method-heading">5. From statistical signal to responsible investigation</h2>
         <div className="insight-steps">
