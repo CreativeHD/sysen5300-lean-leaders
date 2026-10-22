@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js'
 import { useState, Fragment } from 'react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts'
 import { analyzeCsv } from './api'
 import { OverviewInsights, InvestigationDetails } from './Insights'
@@ -148,12 +148,23 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
                 <YAxis />
                 <Tooltip />
                 <Legend />
+                {chartData.some(row => row.phase === 'monitoring') && (
+                  <ReferenceLine
+                    x={chartData.find(row => row.phase === 'monitoring').date}
+                    stroke="#b38b55"
+                    strokeDasharray="5 5"
+                    label={{ value: 'Monitoring starts', position: 'insideTopRight', fill: '#87663d', fontSize: 11 }}
+                  />
+                )}
 
                 <Line
                   dataKey="rate_per_1000"
                   name="Observed Rate"
                   stroke="#2d6a4f"
-                  dot={false}
+                  dot={props => props.payload?.signal ? (
+                    <circle cx={props.cx} cy={props.cy} r={5} fill="#b9563e" stroke="#fff" strokeWidth={2} />
+                  ) : null}
+                  activeDot={{ r: 6 }}
                 />
                 <Line
                   dataKey="center_per_1000"
@@ -175,6 +186,10 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
                 />
               </LineChart>
             </ResponsiveContainer>
+            <p className="chart-note">
+              The dashed vertical line marks the start of monitoring; orange dots mark observations flagged by
+              the Python three-sigma u-chart. Limits change with vehicle exposure, and a signal is not proof of misconduct.
+            </p>
           </section>
 
 <div className="dashboard-row">
