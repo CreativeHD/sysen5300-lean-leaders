@@ -87,7 +87,16 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
         </div>
         <p className="civic-hero__note">Statistical signals are not evidence of unlawful enforcement or discrimination.</p>
       </header>
-      
+
+      <nav className="civic-nav" aria-label="Dashboard sections">
+        <a href="#civicwatch-overview">Overview</a>
+        <a href="#civicwatch-quality">Model checks</a>
+        <a href="#civicwatch-control-chart">Control chart</a>
+        <a href="#civicwatch-comparisons">Comparisons</a>
+        <a href="#civicwatch-investigations">Investigation log</a>
+        <a href="#civicwatch-methods">Methods</a>
+      </nav>
+
       <div className="dashboard-row">
       <section className="workflow">
         <h2>How CivicWatch Works</h2>
@@ -116,7 +125,13 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
         <button onClick={analyze} disabled={!file || loading}>
           {loading ? 'Analyzing...' : 'Analyze Dataset'}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p role="alert" style={{ color: '#a43e22', marginTop: 12 }}>{error}</p>}
+        <p className="civic-samples">
+          Need sample data? Download <a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/baseline.csv">baseline</a>,
+          {' '}<a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/ticket_blitz.csv">ticket blitz</a>,
+          {' '}or <a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/traffic_surge.csv">traffic surge</a> from GitHub.
+          All three are fictional demonstrations.
+        </p>
       </section>
       </div>
 
