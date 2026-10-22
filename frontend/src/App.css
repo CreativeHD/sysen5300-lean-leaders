@@ -462,3 +462,66 @@ input:focus-visible {
     padding: 9px 11px;
   }
 }
+
+
+/* Built-in scenario launcher */
+.civic-demo {
+  margin-top: 18px;
+  padding: 17px 18px;
+  border: 1px solid #d5e6db;
+  background: #f1f8f3;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.civic-demo__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.civic-demo__heading strong {
+  color: #1b563c;
+  font-size: 13px;
+}
+
+.civic-demo__heading span {
+  color: #617869;
+  font-size: 11px;
+}
+
+.civic-demo__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+
+.civic-demo__buttons button {
+  margin: 0;
+  border: 1px solid #bad9c5;
+  background: #fff;
+  color: #215f44;
+  padding: 10px 13px;
+  font-size: 12px;
+  border-radius: 7px;
+  font-weight: 750;
+}
+
+.civic-demo__buttons button:hover:not(:disabled) {
+  background: #e0f0e6;
+}
+
+.civic-demo p,
+.civic-file-status {
+  color: #667c6d;
+  line-height: 1.55;
+  font-size: 11px;
+  margin: 10px 0 0;
+}
+
+.civic-file-status strong {
+  color: #1d5940;
+}
