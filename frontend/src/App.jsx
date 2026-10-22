@@ -5,6 +5,7 @@ import {
   CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
 import { analyzeCsv } from './api'
+import { OverviewInsights, InvestigationDetails } from './Insights'
 import './App.css'
 
 function App() {
@@ -77,10 +78,14 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
 
   return (
     <div className="container">
-      <header>
-        <h1>CivicWatch</h1>
-        <h3>Community Traffic Enforcement Monitoring</h3>
-        <p>CivicWatch helps community orgranizations track traffic enforcement activity, compare patterns, and identify unusual traffic changes.</p>
+      <header className="civic-hero">
+        <div className="civic-hero__eyebrow">CIVICWATCH / COMMUNITY OBSERVATION INTELLIGENCE</div>
+        <h1>Traffic enforcement, examined with evidence.</h1>
+        <p>Explore field-observed stop rates, identify statistical anomalies, and document observations that deserve a closer look.</p>
+        <div className="civic-hero__tags">
+          <span>Poisson u-chart</span><span>Traffic-adjusted rates</span><span>Six Sigma SPC</span>
+        </div>
+        <p className="civic-hero__note">Statistical signals are not evidence of unlawful enforcement or discrimination.</p>
       </header>
       
       <div className="dashboard-row">
@@ -117,25 +122,9 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
 
       {results && (
         <>
-          <section>
-            <h2>2. Summary Results</h2>
-            <div className="summary">
-              <div>
-                <h3>{observations.length}</h3>
-                <p>Total Observations</p>
-              </div>
-              <div>
-                <h3>{groups.length}</h3>
-                <p>Groups Analyzed</p>
-              </div>
-              <div>
-                <h3>{alerts.length}</h3>
-                <p>Monitoring Alerts</p>
-              </div>
-            </div>
-          </section>
+          <OverviewInsights results={results} />
 
-          <section>
+          <section id="civicwatch-control-chart">
             <h2>3. Control Chart</h2>
             <p>Stop rates per 1,000 vehicles</p>
 
@@ -277,37 +266,20 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
               />
             </section>
 
-          <section>
-            <h2>4. Monitoring Alerts</h2>
-
-            {alerts.length === 0 ? (
-              <p>No monitoring alerts detected.</p>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Zone</th>
-                    <th>Shift</th>
-                    <th>Stop Rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {alerts.map((row, i) => (
-                    <tr key={i}>
-                      <td>{row.date}</td>
-                      <td>{row.zone_id}</td>
-                      <td>{row.shift}</td>
-                      <td>{row.rate_per_1000.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
+          <InvestigationDetails
+            results={results}
+            onInspect={(nextZone, nextShift) => {
+              setZone(nextZone)
+              setShift(nextShift)
+              document.getElementById('civicwatch-control-chart')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              })
+            }}
+          />
 
           <section className="next-steps">
-            <h2>5. Recommended Next Steps</h2>
+            <h2>6. Recommended Next Steps</h2>
             {alerts.length > 0 ? (
               <>
                 <p>
@@ -328,8 +300,7 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
             )}
 
             <p className="next-steps-note">
-                Statistical alerts indicate special cause variation, 
-                not proof of misconduct.
+                Statistical alerts are screening signals, not confirmation of a special cause or proof of misconduct.
             </p>
                   </section>
                 </>
