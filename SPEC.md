@@ -2,7 +2,7 @@
 
 **Project:** CivicWatch: Traffic Enforcement Monitoring Dashboard
 
-This specification defines the tool the Lean Leaders team will build for the Cornell SYSEN 5300 Six Sigma Hackathon.
+This specification documents the Lean Leaders team's implemented CivicWatch MVP for the Cornell SYSEN 5300 Six Sigma Hackathon and distinguishes future enhancements from delivered functionality.
 
 ## 1. Team and Prompt
 
@@ -22,7 +22,7 @@ This specification defines the tool the Lean Leaders team will build for the Cor
 
 **Why this matches the prompt:** CivicWatch helps concerned citizens and civil rights organizations document and analyze traffic enforcement patterns, including suspected enforcement blitzes occurring outside documented authorized contexts.
 
-The tool will not independently determine whether government conduct is unlawful or discriminatory.
+The tool does not independently determine whether government conduct is unlawful or discriminatory.
 
 ## 3. Inputs
 
@@ -109,15 +109,15 @@ A subsequent observation containing 7 enforcement stops among 100 vehicles has a
 
 This small example is for validating the calculation. Operational datasets will require more baseline observations.
 
-### Secondary Method: Poisson Rate Comparison
+### Proposed Future Method: Poisson Rate Comparison (Not Implemented)
 
-After the primary SPC calculation is implemented and validated, CivicWatch will support comparisons between monitoring periods or comparable zones.
+A future version could compare monitoring periods or comparable zones after this secondary method is implemented and independently validated. The current MVP uses the Poisson u-chart for statistical alerts.
 
 **Rate ratio:**
 
 RR = (Stops B / Vehicles B) / (Stops A / Vehicles A)
 
-The tool will report:
+A future version could report:
 
 - Enforcement rate in each group.
 - Rate ratio.
@@ -169,19 +169,18 @@ Frontend-to-backend communication and deployment compatibility must be verified 
 
 ## 6. Outputs
 
-CivicWatch will provide:
+The implemented MVP provides:
 
-1. **CSV upload and validation:** Upload observations and identify missing or invalid data.
-2. **Summary metrics:** Display total observed stops, total observed vehicles, and enforcement rates.
-3. **SPC dashboard:** Plot observed enforcement rates with calculated center lines and control limits.
-4. **Statistical signals:** Flag monitoring periods with unusually high or low enforcement rates.
-5. **Area or period comparison:** Display rate ratios and confidence intervals after secondary analysis is validated.
-6. **Flagged-observation details:** Display date, zone, shift, observed stops, vehicles observed, stop rate, control limits, authorization status, policy reference, and source type. Show `unknown` when no authenticated policy reference exists.
-7. **Evidence export:** Download a reproducible summary of observations, statistical results, and assumptions.
+1. **CSV upload and validation:** Accept UTF-8 CSV observations and return descriptive errors for missing, malformed, or invalid data.
+2. **Summary counts and rates:** Display total observations, zone/shift groups, and monitoring alerts. Show stop rates per 1,000 vehicles in charts and zone comparisons.
+3. **SPC control charts:** Plot observed rates, baseline-only center lines, and exposure-adjusted upper and lower limits by zone and shift.
+4. **Statistical signals:** Flag monitoring observations with rates outside their Poisson u-chart limits.
+5. **Descriptive comparisons:** Show monitoring rates by zone, a zone-by-shift alert heatmap, and box-and-whisker distributions of monitoring rates by zone.
+6. **Alert list:** Show flagged dates, zones, shifts, and stop rates. The analysis API also returns vehicle counts, stop counts, control limits, and optional authorization context, but the UI does not currently show all of these fields in its alert table.
 
-Each displayed statistic will include units and an explanation written for a nontechnical user.
+**Proposed future enhancements (not implemented in the MVP):** Poisson rate-ratio comparisons with confidence intervals; a fuller flagged-observation table with authorization status, policy references, and source type; and downloadable evidence summaries.
 
-Flags will be labeled as statistical signals requiring further investigation, not legal conclusions.
+Displayed rates have units, and the UI explains that statistical signals call for further investigation rather than establishing legal conclusions.
 
 ## 7. Test Datasets and Codebook
 
