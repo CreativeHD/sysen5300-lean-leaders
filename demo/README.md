@@ -12,9 +12,11 @@ This walkthrough demonstrates CivicWatch's baseline-only Poisson u-chart using t
 
 1. Open the public dashboard in a desktop browser. It should load without a Posit Connect login.
 2. Use **Choose File** to select one of the downloaded CSVs, then click **Analyze Dataset**.
-3. Confirm that **Summary Results** lists 280 observations and 8 groups. Compare the monitoring alert count with the expected number below.
-4. In **Control Chart**, select the specified zone and shift. Compare the observed rate with the center line, upper control limit (UCL), and lower control limit (LCL).
-5. Scroll to **Monitoring Alerts** to identify flagged dates. Repeat for the remaining CSVs.
+3. In **What the observations show**, confirm the total of 280 observation periods and compare the indicated monitoring alerts with the expected number below. The dataset contains eight zone/shift groups.
+4. Read **Baseline quality and cautions**. On all three datasets, the shared historical baseline generates screening warnings for Zone_B evening (possible overdispersion, 1.738) and Zone_C evening (possible underdispersion, 0.448). These are not formal stability tests.
+5. In **Control Chart**, select the specified zone and shift. The dashed vertical line marks monitoring start; highlighted orange points mark signals. Inspect observed rate, baseline center, upper control limit (UCL), and lower control limit (LCL).
+6. In the **Statistical signal investigation log**, read each flagged date's traffic count, stops, statistical limits, source type, and reported policy context. Try the **Export alert log (.csv)** control if useful.
+7. Repeat for all three demonstration CSVs. Interpret relative rate comparisons as descriptive, not as a confidence interval or a legal finding.
 
 Every sample has 35 observation dates, four fictional zones (`Zone_A` to `Zone_D`), two shifts (`morning` and `evening`), and one observation for each combination. The first 21 dates (September 1–21, 2026) establish each zone/shift baseline. The last 14 dates (September 22–October 5) are monitoring observations. Only monitoring observations count toward the dashboard's alert total.
 
@@ -32,7 +34,7 @@ The simulation has no deliberately introduced enforcement blitz. It does contain
 
 ![Baseline dashboard summary showing 280 observations, eight groups, and one monitoring alert](images/baseline-summary-deployed.png)
 
-*Screenshot captured from the publicly deployed CivicWatch dashboard on October 21, 2026, showing the baseline summary.*
+*Archive screenshot captured from the public October 21, 2026 dashboard. The enhanced review interface now groups these figures into a new overview, baseline warnings, and a detailed investigation log; the expected underlying figures are unchanged.*
 
 **Interpretation:** A generally stable process can still produce an isolated statistical control-limit exceedance due to random variation. One alert is not proof of a sustained change or misconduct.
 
@@ -86,6 +88,18 @@ Again select **Zone_C** and **evening**. In the five-day September 25–29 windo
 
 **Main takeaway:** CivicWatch detects a simulated rise in stop *intensity* while accounting for varying observed traffic volumes. All three scenarios share the same baseline period, so the differences in results come from the injected monitoring conditions, not a change in how the historical limit was estimated.
 
+
+
+## Interpreting the enhanced review panels
+
+- **Quantitative overview:** Pooled counts, exposures, and rates are descriptive across the entire uploaded study. They do not replace the zone/shift-specific SPC decisions.
+- **Baseline quality:** Warnings from the Python analysis engine are displayed to prompt checks of overdispersion, underdispersion, historical representativeness, and temporal dependence. Neither a missing warning nor a passed Python test certifies a process as stable.
+- **Group comparisons:** A monitoring-to-baseline rate ratio is a descriptive comparison, not an independent significance test or confidence interval.
+- **Investigation log:** A signal record includes observed stops and exposure, observed rate, center, statistical limits, source type, and reported authorization context. The fictional `SIM-AUTH-001` reference cannot be treated as a real legal policy.
+- **Export:** The exported CSV is an alert-only review log, not a certified evidence package. It is intended for tracing statistical findings to uploaded observations.
+
+See [SYSEN 5300 course-method alignment](../docs/COURSE_ALIGNMENT.md) and the [field-observation FMEA](../docs/FIELD_OBSERVATION_FMEA.md) for a discussion of modeling choices, measurement risks, and why the tool does not conclude discrimination or illegality.
+
 ## What each chart line means
 
 The analysis operates independently for each `(zone_id, shift)` group:
@@ -104,6 +118,6 @@ The same engine can be run and tested from the repository. See the [main README]
 
 ## Demonstration evidence and verification note
 
-The team verified all three datasets on the **publicly deployed dashboard** on October 21, 2026, obtaining monitoring alert counts of **1, 6, and 1**. The screenshots above were captured from the current public desktop deployment on October 21, 2026. The two control-chart screenshots are cropped to the plotting area; the selected zone and shift are documented in the walkthrough text. The team also verified all three scenario alert totals in the live interface.
+The team verified all three datasets on the **publicly deployed dashboard** on October 21, 2026, obtaining monitoring alert counts of **1, 6, and 1**. The screenshots above were captured from the current public desktop deployment on October 21, 2026. The two control-chart screenshots are cropped to the plotting area; the selected zone and shift are documented in the walkthrough text. These screenshots predate the updated dashboard layout; they illustrate the same underlying Poisson limits and planted signals, not every new UI component. The team also verified all three scenario alert totals in the live interface.
 
 A working application with transparent synthetic test data is a prompt for investigation and quality-control learning, not a substitute for trained field observers, careful sampling, or professional legal analysis.
