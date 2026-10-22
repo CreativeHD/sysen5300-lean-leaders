@@ -16,18 +16,38 @@ function App() {
   const [zone, setZone] = useState('Zone_A')
   const [shift, setShift] = useState('evening')
 
+  async function analyzeSelected(selectedFile) {
+    const data = await analyzeCsv(selectedFile)
+    setResults(data)
+    setZone(data.groups[0].zone_id)
+    setShift(data.groups[0].shift)
+  }
+
   async function analyze() {
     if (!file) return
-
     setLoading(true)
     setError('')
     setResults(null)
-
     try {
-      const data = await analyzeCsv(file)
-      setResults(data)
-      setZone(data.groups[0].zone_id)
-      setShift(data.groups[0].shift)
+      await analyzeSelected(file)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function trySample(name) {
+    if (!['baseline', 'ticket_blitz', 'traffic_surge'].includes(name)) return
+    setLoading(true)
+    setError('')
+    setResults(null)
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}samples/${name}.csv`)
+      if (!response.ok) throw new Error('Could not load the bundled example dataset')
+      const example = new File([await response.blob()], `${name}.csv`, { type: 'text/csv' })
+      setFile(example)
+      await analyzeSelected(example)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -114,24 +134,33 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
       <section>
         <h2>1. Upload Dataset</h2>
         <input
+          aria-label="Upload an observation CSV file"
           type="file"
           accept=".csv"
+          disabled={loading}
           onChange={e => {
             setFile(e.target.files[0])
             setResults(null)
             setError('')
           }}
         />
-        <button onClick={analyze} disabled={!file || loading}>
+        <button type="button" onClick={analyze} disabled={!file || loading}>
           {loading ? 'Analyzing...' : 'Analyze Dataset'}
         </button>
+        <div className="civic-demo">
+          <div className="civic-demo__heading">
+            <strong>Or explore a built-in example</strong>
+            <span>One click · Synthetic demonstration data</span>
+          </div>
+          <div className="civic-demo__buttons">
+            <button type="button" disabled={loading} onClick={() => trySample('baseline')}>Baseline · 1 signal</button>
+            <button type="button" disabled={loading} onClick={() => trySample('ticket_blitz')}>Ticket blitz · 6 signals</button>
+            <button type="button" disabled={loading} onClick={() => trySample('traffic_surge')}>Traffic surge · 1 signal</button>
+          </div>
+          <p>These bundled samples are byte-for-byte copies of the validated GitHub datasets. They use the same analysis API as manual uploads.</p>
+        </div>
+        {file && <p className="civic-file-status" role="status">Selected dataset: <strong>{file.name}</strong></p>}
         {error && <p role="alert" style={{ color: '#a43e22', marginTop: 12 }}>{error}</p>}
-        <p className="civic-samples">
-          Need sample data? Download <a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/baseline.csv">baseline</a>,
-          {' '}<a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/ticket_blitz.csv">ticket blitz</a>,
-          {' '}or <a href="https://github.com/CreativeHD/sysen5300-lean-leaders/blob/main/data/traffic_surge.csv">traffic surge</a> from GitHub.
-          All three are fictional demonstrations.
-        </p>
       </section>
       </div>
 
