@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   phaseTotals, summarizeGroups, evidenceRows, evidenceCsv, numberText,
 } from './insights.js'
@@ -77,4 +78,55 @@ test('no alert case still creates a usable CSV header', () => {
   const csv = evidenceCsv({ observations: [] })
   assert.match(csv, /"Date","Zone"/)
   assert.ok(!csv.includes('2026-09-03'))
+})
+
+
+function loadScenario(name) {
+  const path = new URL('../../data/' + name + '.csv', import.meta.url)
+  const [header, ...lines] = readFileSync(path, 'utf8').trim().split(/\r?\n/)
+  const columns = header.split(',')
+  return lines.map(line => {
+    const raw = Object.fromEntries(line.split(',').map((v, i) => [columns[i], v]))
+    return {
+      ...raw,
+      vehicles_observed: Number(raw.vehicles_observed),
+      stops_observed: Number(raw.stops_observed),
+    }
+  })
+}
+
+test('real bundled CSVs preserve identical baselines with 168/112 phase records', () => {
+  const datasets = ['baseline', 'ticket_blitz', 'traffic_surge'].map(loadScenario)
+  const baselines = datasets.map(rows => rows.filter(row => row.phase === 'baseline'))
+  const monitorings = datasets.map(rows => rows.filter(row => row.phase === 'monitoring'))
+  assert.deepEqual(baselines[0], baselines[1])
+  assert.deepEqual(baselines[0], baselines[2])
+  assert.deepEqual(baselines.map(rows => rows.length), [168, 168, 168])
+  assert.deepEqual(monitorings.map(rows => rows.length), [112, 112, 112])
+  for (const rows of datasets) {
+    const total = phaseTotals(rows, 'monitoring')
+    assert.equal(total.records, 112)
+    assert.ok(total.vehicles > 0)
+    assert.ok(total.rate > 0)
+  }
+})
+
+test('real scenario records reproduce targeted blitz and traffic-surge exposure totals', () => {
+  const target = rows => rows.filter(row =>
+    row.zone_id === 'Zone_C' && row.shift === 'evening' &&
+    row.date >= '2026-09-25' && row.date <= '2026-09-29'
+  )
+  const totals = ['baseline', 'ticket_blitz', 'traffic_surge'].map(name => {
+    const rows = target(loadScenario(name))
+    assert.equal(rows.length, 5)
+    return {
+      vehicles: rows.reduce((sum, x) => sum + x.vehicles_observed, 0),
+      stops: rows.reduce((sum, x) => sum + x.stops_observed, 0),
+    }
+  })
+  assert.deepEqual(totals, [
+    { vehicles: 4425, stops: 45 },
+    { vehicles: 4425, stops: 242 },
+    { vehicles: 8850, stops: 90 },
+  ])
 })
