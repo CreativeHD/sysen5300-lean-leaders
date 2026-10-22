@@ -12,14 +12,14 @@ CivicWatch is a browser-based statistical process control (SPC) dashboard for ex
 
 The public dashboard can be used from a desktop browser without installing Python, Node.js, or VS Code. It uses this separate [FastAPI analysis service](https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/), which also provides [interactive API documentation](https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/docs).
 
-1. Download one of the example CSVs from [`data/`](data/) using GitHub's **Download raw file** control.
-2. Open the dashboard, choose the CSV file, then select **Analyze Dataset**.
+1. Open the dashboard and click a **built-in demo** button (Baseline, Ticket blitz, or Traffic surge) to analyze a validated synthetic CSV immediately. These examples are bundled with the frontend and use the normal FastAPI analysis endpoint.
+2. Alternatively, download any example from [`data/`](data/) using GitHub's **Download raw file** control, upload it manually, then select **Analyze Dataset**.
 3. Read **What the observations show** for counts, pooled rates, and groups with statistical signals. Review any warnings in **Baseline quality and cautions**.
 4. Compare baseline and monitoring rates by zone/shift, then select a zone and shift in **Control Chart**. The dashed line marks monitoring start, and highlighted points show the Python engine's alerts.
 5. Scroll to the **Statistical signal investigation log** for recorded stops, vehicles, historical center, control limits, reported authorization context, and provenance. Optionally export the alert log as a CSV.
 6. Repeat with the other datasets to see how the method distinguishes increased stop *rates* from increased traffic volume.
 
-The [illustrated, three-scenario demonstration](demo/README.md) explains exactly what to expect. Professor Fraser confirmed that a screenshot-based or guided walkthrough is an acceptable demonstration format for the Distance Learning Hackathon.
+The [illustrated, three-scenario demonstration](demo/README.md) explains exactly what to expect. [Frontend tests](frontend/src/insights.test.js) confirm that the three built-in demonstration files match their canonical repository CSVs byte for byte.  Professor Fraser confirmed that a screenshot-based or guided walkthrough is an acceptable demonstration format for the Distance Learning Hackathon.
 
 ## Three reproducible test scenarios
 
