@@ -130,3 +130,12 @@ test('real scenario records reproduce targeted blitz and traffic-surge exposure 
     { vehicles: 8850, stops: 90 },
   ])
 })
+
+
+test('bundled demo CSVs exactly match original validated sample files', () => {
+  for (const name of ['baseline', 'ticket_blitz', 'traffic_surge']) {
+    const canonical = readFileSync(new URL('../../data/' + name + '.csv', import.meta.url))
+    const bundled = readFileSync(new URL('../public/samples/' + name + '.csv', import.meta.url))
+    assert.deepEqual(bundled, canonical, name + ' demo copy should match canonical fixture')
+  }
+})
