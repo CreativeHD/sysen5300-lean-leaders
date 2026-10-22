@@ -116,7 +116,7 @@ The project's [`SPEC.md`](SPEC.md) describes proposed future enhancements, inclu
 
 ## Run locally and reproduce
 
-**Prerequisites:** Python 3.12, Node.js 22+, npm, and Git. The published dashboard above does not require any of these tools. While this work remains on `hackathon-civicwatch`, switch to that branch after cloning; the team plans a reviewed merge into the default `main` branch before submission.
+**Prerequisites:** Python 3.12, Node.js 22+, npm, and Git. The published dashboard above does not require any of these tools. Clone the repository's default `main` branch; no additional branch switch is needed.
 
 ### Windows PowerShell
 
@@ -124,7 +124,6 @@ The project's [`SPEC.md`](SPEC.md) describes proposed future enhancements, inclu
 # From a new directory:
 git clone https://github.com/CreativeHD/sysen5300-lean-leaders.git
 cd sysen5300-lean-leaders
-git switch hackathon-civicwatch
 
 # Install and verify the Python backend:
 py -3.12 -m pip install -r app/requirements-dev.txt
@@ -147,7 +146,7 @@ Open the local Vite URL (typically `http://localhost:5173/`) and upload one of t
 
 ### macOS or Linux
 
-From the repository root after cloning and switching to `hackathon-civicwatch`:
+From the repository root after cloning the default `main` branch:
 
 ```bash
 python3 -m pip install -r app/requirements-dev.txt
