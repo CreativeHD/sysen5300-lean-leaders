@@ -2,9 +2,10 @@ import Plot from 'react-plotly.js'
 import { useState, Fragment } from 'react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts'
 import { analyzeCsv } from './api'
+import { OverviewInsights, InvestigationDetails } from './Insights'
 import './App.css'
 
 function App() {
@@ -15,18 +16,38 @@ function App() {
   const [zone, setZone] = useState('Zone_A')
   const [shift, setShift] = useState('evening')
 
+  async function analyzeSelected(selectedFile) {
+    const data = await analyzeCsv(selectedFile)
+    setResults(data)
+    setZone(data.groups[0].zone_id)
+    setShift(data.groups[0].shift)
+  }
+
   async function analyze() {
     if (!file) return
-
     setLoading(true)
     setError('')
     setResults(null)
-
     try {
-      const data = await analyzeCsv(file)
-      setResults(data)
-      setZone(data.groups[0].zone_id)
-      setShift(data.groups[0].shift)
+      await analyzeSelected(file)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function trySample(name) {
+    if (!['baseline', 'ticket_blitz', 'traffic_surge'].includes(name)) return
+    setLoading(true)
+    setError('')
+    setResults(null)
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}samples/${name}.csv`)
+      if (!response.ok) throw new Error('Could not load the bundled example dataset')
+      const example = new File([await response.blob()], `${name}.csv`, { type: 'text/csv' })
+      setFile(example)
+      await analyzeSelected(example)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -77,12 +98,25 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
 
   return (
     <div className="container">
-      <header>
-        <h1>CivicWatch</h1>
-        <h3>Community Traffic Enforcement Monitoring</h3>
-        <p>CivicWatch helps community orgranizations track traffic enforcement activity, compare patterns, and identify unusual traffic changes.</p>
+      <header className="civic-hero">
+        <div className="civic-hero__eyebrow">CIVICWATCH / COMMUNITY OBSERVATION INTELLIGENCE</div>
+        <h1>Traffic enforcement, examined with evidence.</h1>
+        <p>Explore field-observed stop rates, identify statistical anomalies, and document observations that deserve a closer look.</p>
+        <div className="civic-hero__tags">
+          <span>Poisson u-chart</span><span>Traffic-adjusted rates</span><span>Six Sigma SPC</span>
+        </div>
+        <p className="civic-hero__note">Statistical signals are not evidence of unlawful enforcement or discrimination.</p>
       </header>
-      
+
+      <nav className="civic-nav" aria-label="Dashboard sections">
+        <a href="#civicwatch-overview">Overview</a>
+        <a href="#civicwatch-quality">Model checks</a>
+        <a href="#civicwatch-control-chart">Control chart</a>
+        <a href="#civicwatch-comparisons">Comparisons</a>
+        <a href="#civicwatch-investigations">Investigation log</a>
+        <a href="#civicwatch-methods">Methods</a>
+      </nav>
+
       <div className="dashboard-row">
       <section className="workflow">
         <h2>How CivicWatch Works</h2>
@@ -100,42 +134,41 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
       <section>
         <h2>1. Upload Dataset</h2>
         <input
+          aria-label="Upload an observation CSV file"
           type="file"
           accept=".csv"
+          disabled={loading}
           onChange={e => {
             setFile(e.target.files[0])
             setResults(null)
             setError('')
           }}
         />
-        <button onClick={analyze} disabled={!file || loading}>
+        <button type="button" onClick={analyze} disabled={!file || loading}>
           {loading ? 'Analyzing...' : 'Analyze Dataset'}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="civic-demo">
+          <div className="civic-demo__heading">
+            <strong>Or explore a built-in example</strong>
+            <span>One click · Synthetic demonstration data</span>
+          </div>
+          <div className="civic-demo__buttons">
+            <button type="button" disabled={loading} onClick={() => trySample('baseline')}>Baseline · 1 signal</button>
+            <button type="button" disabled={loading} onClick={() => trySample('ticket_blitz')}>Ticket blitz · 6 signals</button>
+            <button type="button" disabled={loading} onClick={() => trySample('traffic_surge')}>Traffic surge · 1 signal</button>
+          </div>
+          <p>These bundled samples are byte-for-byte copies of the validated GitHub datasets. They use the same analysis API as manual uploads.</p>
+        </div>
+        {file && <p className="civic-file-status" role="status">Selected dataset: <strong>{file.name}</strong></p>}
+        {error && <p role="alert" style={{ color: '#a43e22', marginTop: 12 }}>{error}</p>}
       </section>
       </div>
 
       {results && (
         <>
-          <section>
-            <h2>2. Summary Results</h2>
-            <div className="summary">
-              <div>
-                <h3>{observations.length}</h3>
-                <p>Total Observations</p>
-              </div>
-              <div>
-                <h3>{groups.length}</h3>
-                <p>Groups Analyzed</p>
-              </div>
-              <div>
-                <h3>{alerts.length}</h3>
-                <p>Monitoring Alerts</p>
-              </div>
-            </div>
-          </section>
+          <OverviewInsights results={results} />
 
-          <section>
+          <section id="civicwatch-control-chart">
             <h2>3. Control Chart</h2>
             <p>Stop rates per 1,000 vehicles</p>
 
@@ -159,12 +192,23 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
                 <YAxis />
                 <Tooltip />
                 <Legend />
+                {chartData.some(row => row.phase === 'monitoring') && (
+                  <ReferenceLine
+                    x={chartData.find(row => row.phase === 'monitoring').date}
+                    stroke="#b38b55"
+                    strokeDasharray="5 5"
+                    label={{ value: 'Monitoring starts', position: 'insideTopRight', fill: '#87663d', fontSize: 11 }}
+                  />
+                )}
 
                 <Line
                   dataKey="rate_per_1000"
                   name="Observed Rate"
                   stroke="#2d6a4f"
-                  dot={false}
+                  dot={props => props.payload?.signal ? (
+                    <circle cx={props.cx} cy={props.cy} r={5} fill="#b9563e" stroke="#fff" strokeWidth={2} />
+                  ) : null}
+                  activeDot={{ r: 6 }}
                 />
                 <Line
                   dataKey="center_per_1000"
@@ -186,6 +230,10 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
                 />
               </LineChart>
             </ResponsiveContainer>
+            <p className="chart-note">
+              The dashed vertical line marks the start of monitoring; orange dots mark observations flagged by
+              the Python three-sigma u-chart. Limits change with vehicle exposure, and a signal is not proof of misconduct.
+            </p>
           </section>
 
 <div className="dashboard-row">
@@ -277,37 +325,20 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
               />
             </section>
 
-          <section>
-            <h2>4. Monitoring Alerts</h2>
-
-            {alerts.length === 0 ? (
-              <p>No monitoring alerts detected.</p>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Zone</th>
-                    <th>Shift</th>
-                    <th>Stop Rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {alerts.map((row, i) => (
-                    <tr key={i}>
-                      <td>{row.date}</td>
-                      <td>{row.zone_id}</td>
-                      <td>{row.shift}</td>
-                      <td>{row.rate_per_1000.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
+          <InvestigationDetails
+            results={results}
+            onInspect={(nextZone, nextShift) => {
+              setZone(nextZone)
+              setShift(nextShift)
+              document.getElementById('civicwatch-control-chart')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              })
+            }}
+          />
 
           <section className="next-steps">
-            <h2>5. Recommended Next Steps</h2>
+            <h2>6. Recommended Next Steps</h2>
             {alerts.length > 0 ? (
               <>
                 <p>
@@ -328,8 +359,7 @@ const zones = [...new Set(observations.map(row => row.zone_id))]
             )}
 
             <p className="next-steps-note">
-                Statistical alerts indicate special cause variation, 
-                not proof of misconduct.
+                Statistical alerts are screening signals, not confirmation of a special cause or proof of misconduct.
             </p>
                   </section>
                 </>

@@ -12,13 +12,14 @@ CivicWatch is a browser-based statistical process control (SPC) dashboard for ex
 
 The public dashboard can be used from a desktop browser without installing Python, Node.js, or VS Code. It uses this separate [FastAPI analysis service](https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/), which also provides [interactive API documentation](https://connect.systems-apps.com/content/c1c8025f-66c6-46dc-ad09-0cea7e56dca1/docs).
 
-1. Download one of the example CSVs from [`data/`](data/) using GitHub's **Download raw file** control.
-2. Open the dashboard, choose the CSV file, then select **Analyze Dataset**.
-3. Read the summary results: number of observations, zone/shift groups, and monitoring alerts.
-4. Select a zone and shift to inspect its time-series control chart. Scroll down for alerts and the additional zone comparisons.
-5. Repeat with the other datasets to see how the method distinguishes increased stop *rates* from increased traffic volume.
+1. Open the dashboard and click a **built-in demo** button (Baseline, Ticket blitz, or Traffic surge) to analyze a validated synthetic CSV immediately. These examples are bundled with the frontend and use the normal FastAPI analysis endpoint.
+2. Alternatively, download any example from [`data/`](data/) using GitHub's **Download raw file** control, upload it manually, then select **Analyze Dataset**.
+3. Read **What the observations show** for counts, pooled rates, and groups with statistical signals. Review any warnings in **Baseline quality and cautions**.
+4. Compare baseline and monitoring rates by zone/shift, then select a zone and shift in **Control Chart**. The dashed line marks monitoring start, and highlighted points show the Python engine's alerts.
+5. Scroll to the **Statistical signal investigation log** for recorded stops, vehicles, historical center, control limits, reported authorization context, and provenance. Optionally export the alert log as a CSV.
+6. Repeat with the other datasets to see how the method distinguishes increased stop *rates* from increased traffic volume.
 
-The [illustrated, three-scenario demonstration](demo/README.md) explains exactly what to expect. Professor Fraser confirmed that a screenshot-based or guided walkthrough is an acceptable demonstration format for the Distance Learning Hackathon.
+The [illustrated, three-scenario demonstration](demo/README.md) explains exactly what to expect. [Frontend tests](frontend/src/insights.test.js) confirm that the three built-in demonstration files match their canonical repository CSVs byte for byte.  Professor Fraser confirmed that a screenshot-based or guided walkthrough is an acceptable demonstration format for the Distance Learning Hackathon.
 
 ## Three reproducible test scenarios
 
@@ -88,8 +89,11 @@ The Python entry point is [`app/qc.py`](app/qc.py), function `u_chart(rows, min_
 - **UCL and LCL:** Exposure-sensitive statistical control limits, not policy or legal thresholds.
 - **Monitoring alerts:** Number of monitoring observations outside their limits across all groups.
 - **Zone summaries and distributions:** Exploratory comparisons of observed rates and alerts across zones; these do not establish causes.
+- **Quantitative overview:** Descriptive pooled stops, observed vehicles, baseline/monitoring rates, and relative change. These are not independent inferential tests.
+- **Data-quality and baseline warnings:** Existing Pearson dispersion and limited-history warnings returned by the Python API are shown to the reviewer; they do not establish that a baseline is stable.
+- **Investigation log:** Flagged records include observed stop counts, traffic exposure, estimated center, control limits, and *unverified* contextual authorization/source fields. The log can be downloaded as CSV.
 
-The dashboard also includes a box-and-whisker visualization of monitoring rates by zone. It provides a descriptive view of the rates, not a numerical standard-deviation statistic. The independent Poisson u-chart, rather than this comparison plot, determines monitoring alerts.
+The dashboard also includes a box-and-whisker visualization of monitoring rates by zone. It provides a descriptive view of the rates, not a numerical standard-deviation statistic. The independent Poisson u-chart, rather than this comparison plot or the descriptive rate ratios, determines monitoring alerts.
 
 ### Assumptions and limitations
 
@@ -97,7 +101,9 @@ The method assumes reasonably comparable observation windows, consistently recor
 
 **An SPC signal calls for data-quality checks and further context, not an accusation.** No actual legal authorization status has been determined from the synthetic datasets. Do not upload names, license plates, or other sensitive personal information to this demonstration application.
 
-The project's [`SPEC.md`](SPEC.md) describes proposed future enhancements, including rate-ratio confidence intervals and evidence export. **Those proposed extensions are not implemented in the current MVP** and are not required to use the existing Poisson u-chart dashboard.
+A binomial p-chart is a related model when each vehicle can be classified as stopped or not stopped. The Poisson u-chart is a rare-event approximation in this context; it is not universally equivalent to a p-chart. Baseline diagnostics are heuristic screens, not formal process-stability proofs. See [**course alignment, model selection, and SPC limitations**](docs/COURSE_ALIGNMENT.md).
+
+The upgraded frontend can **export an alert-only CSV** for review, but it does not provide a certified comprehensive evidence package or automated legal verification. Confidence intervals for rate ratios, extended SPC rules, and formal field validation remain outside the current MVP. See [`SPEC.md`](SPEC.md) for the implemented/future scope and the [field-observation FMEA](docs/FIELD_OBSERVATION_FMEA.md) for measurement risks.
 
 ## Architecture and source files
 
@@ -110,6 +116,9 @@ The project's [`SPEC.md`](SPEC.md) describes proposed future enhancements, inclu
 | [`tests/test_qc.py`](tests/test_qc.py) | Statistical known-answer, scenario, and edge-case tests |
 | [`app/test_app.py`](app/test_app.py) | Backend HTTP endpoint tests |
 | [`demo/README.md`](demo/README.md) | Guided three-dataset demonstration |
+| [`docs/COURSE_ALIGNMENT.md`](docs/COURSE_ALIGNMENT.md) | SYSEN 5300 methods, model selection, assumption checks, and limitations |
+| [`docs/FIELD_OBSERVATION_FMEA.md`](docs/FIELD_OBSERVATION_FMEA.md) | FMEA of field observation, baseline, and policy-reference failure modes |
+| [`frontend/src/insights.test.js`](frontend/src/insights.test.js) | Descriptive aggregation and CSV evidence-log regression tests |
 | [`CONTRACT.yaml`](CONTRACT.yaml) | Hackathon task and verification ledger |
 
 `POST /analyze` accepts a multipart form upload with field name `file`. `GET /` returns service status, and `GET /docs` provides FastAPI's interactive endpoint documentation. The server delegates all statistical calculations to `u_chart` and returns JSON; the React UI renders the returned results.
@@ -139,6 +148,7 @@ In a **second terminal**, from the repository root:
 ```powershell
 cd frontend
 npm.cmd ci
+npm.cmd test
 npm.cmd run dev
 ```
 
@@ -160,6 +170,7 @@ In another terminal, from the repository root:
 ```bash
 cd frontend
 npm ci
+npm test
 npm run dev
 ```
 
@@ -174,7 +185,7 @@ On Windows, use `py -3.12` instead of `python3` if preferred. The sample CSVs ar
 
 ## Deployment and submission
 
-The frontend and API are **separate** Posit Connect content items. The [frontend deployment workflow](.github/workflows/deploy-react-static.yml) builds the frontend, publishes its static `dist/` assets, and checks the published URL. Automatic push deployment is intentionally paused; future frontend changes need a coordinated manual publish. The existing public application remains live.
+The frontend and API are **separate** Posit Connect content items. The [frontend deployment workflow](.github/workflows/deploy-react-static.yml) builds the frontend, publishes its static `dist/` assets, and checks the published URL. Automatic push deployment is intentionally paused; frontend changes still require a coordinated manual publish. A separate, **non-deploying** pull-request workflow runs Python tests, frontend unit tests, lint, and a build. The live application is not updated just by merging code.
 
 **Hackathon:** Virtual Distance Learning Challenge, Cornell SYSEN 5300. The Canvas submission requires the team's public repository link and Devpost project link. Confirm the published project is accessible without a login. The confirmed deadline is **October 23, 2026, at 3:00 PM Eastern**.
 

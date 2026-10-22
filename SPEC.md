@@ -171,16 +171,18 @@ Frontend-to-backend communication and deployment compatibility must be verified 
 
 The implemented MVP provides:
 
-1. **CSV upload and validation:** Accept UTF-8 CSV observations and return descriptive errors for missing, malformed, or invalid data.
-2. **Summary counts and rates:** Display total observations, zone/shift groups, and monitoring alerts. Show stop rates per 1,000 vehicles in charts and zone comparisons.
+1. **CSV upload, built-in demonstrations, and validation:** Accept UTF-8 CSV observations, offer one-click access to the three validated synthetic scenarios, and return descriptive errors for missing, malformed, or invalid data.
+2. **Summary counts and rates:** Display observation counts, vehicles observed, stops observed, pooled baseline/monitoring rates, and the monitoring-to-baseline descriptive rate comparison. Show stop rates per 1,000 vehicles in charts and group comparisons.
 3. **SPC control charts:** Plot observed rates, baseline-only center lines, and exposure-adjusted upper and lower limits by zone and shift.
 4. **Statistical signals:** Flag monitoring observations with rates outside their Poisson u-chart limits.
 5. **Descriptive comparisons:** Show monitoring rates by zone, a zone-by-shift alert heatmap, and box-and-whisker distributions of monitoring rates by zone.
-6. **Alert list:** Show flagged dates, zones, shifts, and stop rates. The analysis API also returns vehicle counts, stop counts, control limits, and optional authorization context, but the UI does not currently show all of these fields in its alert table.
+6. **Investigation log:** Show flagged dates, zones, shifts, stop counts, vehicle exposures, stop rates, estimated center lines, control limits, source provenance, and *reported, unverified* authorization context. Provide an alert-only CSV export.
+7. **Statistical cautions:** Expose the API's Pearson dispersion and insufficient-baseline warnings, without treating the screening heuristics as proof of baseline stability.
+8. **Six Sigma interpretation:** Explain measurement review, baseline assumptions, limitations of multiple monitoring checks, and the distinction between a statistical flag and a legal finding.
 
-**Proposed future enhancements (not implemented in the MVP):** Poisson rate-ratio comparisons with confidence intervals; a fuller flagged-observation table with authorization status, policy references, and source type; and downloadable evidence summaries.
+**Proposed future enhancements (not implemented in the MVP):** Validated rate-ratio confidence intervals and inferential tests; additional appropriately adapted SPC run/trend rules; formal stability and independence assessments; authenticated policy and field-data verification; and a complete, governed evidence-report package beyond the current alert-only CSV download.
 
-Displayed rates have units, and the UI explains that statistical signals call for further investigation rather than establishing legal conclusions.
+Displayed rates have units, and the UI explains that statistical signals call for further investigation rather than establishing legal conclusions. Additional measurement risks and course-method distinctions are documented in [`docs/FIELD_OBSERVATION_FMEA.md`](docs/FIELD_OBSERVATION_FMEA.md) and [`docs/COURSE_ALIGNMENT.md`](docs/COURSE_ALIGNMENT.md).
 
 ## 7. Test Datasets and Codebook
 
