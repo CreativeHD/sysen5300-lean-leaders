@@ -42,7 +42,7 @@ test('zone/shift summaries compare like-for-like groups', () => {
   const summary = summarizeGroups(sample)
   assert.equal(summary.length, 2)
   assert.equal(summary[0].signals, 1)
-  assert.equal(summary[0].ratio, 4.2)
+  assert.ok(Math.abs(summary[0].ratio - 4.2) < 1e-10)
   assert.deepEqual(summary[1].warnings, ['check baseline'])
   assert.equal(summary[1].signals, 0)
 })
