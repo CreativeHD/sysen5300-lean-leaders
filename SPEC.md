@@ -171,7 +171,7 @@ Frontend-to-backend communication and deployment compatibility must be verified 
 
 The implemented MVP provides:
 
-1. **CSV upload and validation:** Accept UTF-8 CSV observations and return descriptive errors for missing, malformed, or invalid data.
+1. **CSV upload, built-in demonstrations, and validation:** Accept UTF-8 CSV observations, offer one-click access to the three validated synthetic scenarios, and return descriptive errors for missing, malformed, or invalid data.
 2. **Summary counts and rates:** Display observation counts, vehicles observed, stops observed, pooled baseline/monitoring rates, and the monitoring-to-baseline descriptive rate comparison. Show stop rates per 1,000 vehicles in charts and group comparisons.
 3. **SPC control charts:** Plot observed rates, baseline-only center lines, and exposure-adjusted upper and lower limits by zone and shift.
 4. **Statistical signals:** Flag monitoring observations with rates outside their Poisson u-chart limits.
