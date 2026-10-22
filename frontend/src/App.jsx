@@ -1,5 +1,5 @@
 import Plot from 'react-plotly.js'
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -54,12 +54,23 @@ function App() {
    }
   })
 
-  // Monitoring alerts are observations outside control limits
+ 
   const alerts = observations.filter(
     row => row.phase === 'monitoring' && row.signal
   )
 
-  // Select the observations for one zone and shift
+const zones = [...new Set(observations.map(row => row.zone_id))]
+  const shifts = [...new Set(observations.map(row => row.shift))]
+
+  const alertCount = (zone, shift) =>
+    alerts.filter(row => row.zone_id === zone && row.shift === shift).length
+
+  const maxAlerts = Math.max(1, ...zones.flatMap(zone =>
+    shifts.map(shift => alertCount(zone, shift))
+  ))
+
+
+
   const chartData = observations
     .filter(row => row.zone_id === zone && row.shift === shift)
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -139,61 +150,7 @@ function App() {
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-            <div className="dashboard-row">
-            <section>
-              <h2>Enforcement Rates by Zone</h2>
-              <p>Monitoring Period Stops per 1,000 Observed Vehicles.</p>
-
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={zoneData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="zone" />
-                  <YAxis />
-                  <Tooltip formatter={value => Number(value).toFixed(2)} />
-                  <Bar dataKey="rate" name="Stop Rate" fill="#2d6a4f" />
-                </BarChart>
-              </ResponsiveContainer>
-            </section>
             
-            <section>
-              <h2>Monitoring Alerts by Zone</h2>
-              <p>Number of Monitoring Observations Outside Statistical Control Limits.</p>
-
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={zoneData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="zone" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="alerts" name="Alerts" fill="#d97745" />
-                </BarChart>
-              </ResponsiveContainer>
-            </section>
-            </div>
-            
-            <section>
-              <h2>Standard Deviation by Zone</h2>
-              <p>Variation in Monitoring Stop Rates per 1,000 Vehicles.</p>
-
-              <Plot
-                data={[...new Set(observations.map(row => row.zone_id))].map(zone => ({
-                  y: observations
-                    .filter(row => row.zone_id === zone && row.phase === 'monitoring' && row.vehicles_observed > 0)
-                    .map(row => row.rate_per_1000),
-                  type: 'box',
-                  name: zone,
-                  marker: { color: '#40916c' },
-                  boxpoints: 'outliers'
-                }))}
-                layout={{
-                  height: 350,
-                  yaxis: { title: 'Stops per 1,000 vehicles' },
-                  showlegend: false
-                }}
-                style={{ width: '100%' }}
-                useResizeHandler
-              />
-            </section>
 
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData}>
@@ -230,6 +187,95 @@ function App() {
               </LineChart>
             </ResponsiveContainer>
           </section>
+
+<div className="dashboard-row">
+            <section>
+              <h2>Enforcement Rates by Zone</h2>
+              <p>Monitoring Period Stops per 1,000 Observed Vehicles.</p>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={zoneData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="zone" />
+                  <YAxis />
+                  <Tooltip formatter={value => Number(value).toFixed(2)} />
+                  <Bar dataKey="rate" name="Stop Rate" fill="#2d6a4f" />
+                </BarChart>
+              </ResponsiveContainer>
+            </section>
+            
+            <section>
+              <h2>Monitoring Alerts by Zone and Shift</h2>
+              <p>Number of Statistical Alerts Detected During the Monitoring Period.</p>
+
+              <div
+              className="heatmap"
+              style={{
+                gridTemplateColumns: `100px repeat(${shifts.length},minmax(70px, 1fr))`
+              }}
+              >
+                <span></span>
+
+                {shifts.map(shift => (
+                  <strong key={shift}>{shift}</strong>
+                 ))}
+
+                 {zones.map(zone => (
+                  <Fragment key={zone}>
+                    <strong>{zone}</strong>
+
+                    {shifts.map(shift => {
+                      const count = alertCount(zone, shift)
+                      const high = count > 0 && count / maxAlerts > 0.5
+
+                      return(
+                        <div
+                          key={shift}
+                          className="heatmap-cell"
+                          style={{
+                            background: count === 0 ? '#E9EEE6' :
+                              high ? '#A64E32' : '#D9AD7B',
+                            color: high ? '#FFFFFF' : '#183C32'
+                          }}
+                          title={`${zone} / ${shift}: ${count} alerts`}
+                        >
+                          {count}
+                        </div>
+                      )
+                    })}
+                  </Fragment>
+                 ))}
+              </div>
+
+              <p className="heatmap-note">
+                Darker colors indicate more statistical alerts, not evidence of misconduct.
+              </p>
+            </section>
+            </div>
+
+            <section>
+              <h2>Standard Deviation by Zone</h2>
+              <p>Variation in Monitoring Stop Rates per 1,000 Vehicles.</p>
+
+              <Plot
+                data={[...new Set(observations.map(row => row.zone_id))].map(zone => ({
+                  y: observations
+                    .filter(row => row.zone_id === zone && row.phase === 'monitoring' && row.vehicles_observed > 0)
+                    .map(row => row.rate_per_1000),
+                  type: 'box',
+                  name: zone,
+                  marker: { color: '#40916c' },
+                  boxpoints: 'outliers'
+                }))}
+                layout={{
+                  height: 350,
+                  yaxis: { title: 'Stops per 1,000 vehicles' },
+                  showlegend: false
+                }}
+                style={{ width: '100%' }}
+                useResizeHandler
+              />
+            </section>
 
           <section>
             <h2>4. Monitoring Alerts</h2>

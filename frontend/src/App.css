@@ -283,3 +283,37 @@ button:hover:not(:disabled) {
     grid-template-columns: 1fr;
   }
 }
+
+.heatmap {
+  display: grid;
+  gap: 6px;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.heatmap strong {
+  align-self: center;
+  text-align: center;
+  font-size: 13px;
+  color: #183C32;
+}
+
+.heatmap-cell {
+  display: grid;
+  place-items: center;
+  min-height: 60px;
+  border-radius: 4px;
+  font-size: 22px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.heatmap-cell:hover {
+  transform: translateY(-2px);
+}
+
+.heatmap-note {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #617469;
+}
