@@ -1,6 +1,6 @@
 # CivicWatch React dashboard
 
-CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The React interface uploads a CSV to the team's FastAPI backend and displays group charts, monitoring alerts, baseline diagnostic warnings, descriptive comparisons, detailed investigation records, and alert-only CSV downloads. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
+CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The React interface accepts manual CSV upload or one-click bundled sample datasets, sends them through the same FastAPI endpoint, and displays charts, monitoring alerts, baseline diagnostic warnings, descriptive comparisons, detailed investigation records, and alert-only CSV downloads. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
 
 **Public dashboard:** https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/
 
