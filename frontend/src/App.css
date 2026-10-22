@@ -409,3 +409,56 @@ input:focus-visible {
   .dashboard-row section, section { padding: 18px; }
   .next-steps { padding: 20px; }
 }
+
+
+/* Light-weight navigation and sample dataset guidance */
+.civic-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 13px 0 0;
+}
+
+.civic-nav a {
+  border: 1px solid #d9e7dd;
+  background: #eef5ef;
+  color: #245943;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 13px;
+  border-radius: 25px;
+}
+
+.civic-nav a:hover,
+.civic-nav a:focus-visible {
+  background: #dceee1;
+  border-color: #add0b9;
+}
+
+.civic-samples {
+  margin-top: 15px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #66776a;
+}
+
+.civic-samples a {
+  color: #1e6749;
+  font-weight: 750;
+}
+
+.insight-section[id] {
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 600px) {
+  .civic-nav {
+    gap: 6px;
+  }
+  .civic-nav a {
+    font-size: 11px;
+    padding: 9px 11px;
+  }
+}
