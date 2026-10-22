@@ -1,6 +1,6 @@
 # CivicWatch React dashboard
 
-CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The React interface uploads a CSV to the team's FastAPI backend and displays group charts, monitoring alerts, and descriptive comparisons. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
+CivicWatch is a Six Sigma hackathon demonstration of baseline-only Poisson u-charts for field-observed traffic enforcement stops per 1,000 vehicles. The React interface uploads a CSV to the team's FastAPI backend and displays group charts, monitoring alerts, baseline diagnostic warnings, descriptive comparisons, detailed investigation records, and alert-only CSV downloads. The datasets are synthetic; a statistical signal is not evidence of unlawful enforcement.
 
 **Public dashboard:** https://connect.systems-apps.com/content/0d9b2040-b25f-4d19-82ff-6f6f20b9511e/
 
@@ -23,6 +23,7 @@ In a **second** terminal, from the repository root:
 ```powershell
 cd frontend
 npm.cmd ci
+npm.cmd test
 npm.cmd run dev
 ```
 
@@ -39,6 +40,7 @@ Restart Vite after changing `.env.local`. `VITE_API_BASE` is a **public applicat
 ```powershell
 cd frontend
 npm.cmd ci
+npm.cmd test
 npm.cmd run lint
 npm.cmd run build
 ```
@@ -47,11 +49,11 @@ Vite outputs a static `dist/` directory. `base: './'` in `vite.config.js` keeps 
 
 ## Deployment status
 
-The React frontend and FastAPI backend are **separate Posit Connect content items**. The dashboard is **already published**, responds without a login, and passed GitHub's final public-access check. All three sample datasets were also verified through its public user interface on October 21, 2026.
+The React frontend and FastAPI backend are **separate Posit Connect content items**. The dashboard's preceding release is **already published**, responds without a login, and passed GitHub's public-access check. All three sample datasets were verified in the public UI before the course-aligned enhancement branch. Features in this branch remain preview-only until a reviewed merge and manually approved redeployment.
 
 The workflow is [`.github/workflows/deploy-react-static.yml`](../.github/workflows/deploy-react-static.yml). It uses the instructor's static publishing scripts and the repository's `CONNECT_SERVER` and `CONNECT_API_KEY` **GitHub Actions secrets**. Do not store or print those credentials in the source code or documentation.
 
-**Automatic publishing is intentionally paused.** The workflow currently has `workflow_dispatch` but no `push` trigger, so pushing a frontend change does not update the deployed dashboard. Publishing any further frontend changes must be coordinated with the team and performed by a repository maintainer using an available manual workflow mechanism. Since the workflow lives on `hackathon-civicwatch` rather than default `main`, GitHub's normal **Run workflow** button may not appear. Do not assume the live dashboard has changed just because GitHub source files have changed.
+**Automatic publishing is intentionally paused.** The workflow currently has `workflow_dispatch` but no `push` trigger, so pushing a frontend change does not update the deployed dashboard. Publishing any frontend change must be coordinated with the team and initiated manually from GitHub Actions using the default `main` branch. GitHub's **Run workflow** button is available because the deploy workflow exists on `main`. A separate [non-deploying pull-request validation workflow](../.github/workflows/validate-civicwatch.yml) tests Python, frontend calculations, lint and build; **passing it does not update the live dashboard**.
 
 After any redeployment, confirm the dashboard is still accessible anonymously and upload all three CSVs. Do not create a second content item or overwrite the separately managed backend by accident.
 
@@ -66,5 +68,7 @@ From the repository's [`data/`](../data/) folder, download and upload each CSV:
 | `traffic_surge.csv` | 280 | 8 | **1** |
 
 For `ticket_blitz.csv`, select **Zone_C, evening** and inspect five planted upper-limit exceedances on September 25–29. For `traffic_surge.csv`, choose the same group and see changing control limits without signals on those five target days.
+
+The enhanced interface also displays the API's two baseline dispersion warnings, descriptive rate comparisons, a detailed context-rich alert log, and an exportable CSV. The export is a screening artifact, **not an authenticated legal evidence package**. Read [course alignment](../docs/COURSE_ALIGNMENT.md) and the [observation FMEA](../docs/FIELD_OBSERVATION_FMEA.md) for interpretation and risk controls.
 
 A successful CI run alone does not prove statistical behavior. For the illustrated demonstration and measured expected results, see [`../demo/README.md`](../demo/README.md).
