@@ -29,6 +29,14 @@ Every sample has 35 observation dates, four fictional zones (`Zone_A` to `Zone_D
 | Total observations | **280** |
 | Groups analyzed | **8** |
 | Monitoring alerts | **1** |
+| Observed vehicles | **240,363** |
+| Observed stops | **2,446** |
+| Baseline rate (stops per 1,000 vehicles) | **10.19** |
+| Monitoring rate (stops per 1,000 vehicles) | **10.16** |
+| Relative rate change | **-0.3%** |
+| Groups with signals | **1 / 8** |
+
+*The rows after "Monitoring alerts" are the overview tiles under **What the observations show**. The vehicle, stop, rate and change tiles pool all zones and shifts, so they are descriptive only, not a significance test. The alert count and "Groups with signals" come from the per-group Poisson u-chart. The same rows appear in the tables below.*
 
 The simulation has no deliberately introduced enforcement blitz. It does contain one incidental above-limit observation at **Zone_A, evening, September 24, 2026**. Select **Zone_A** and **evening** in the control-chart selectors and inspect the observation near that date.
 
@@ -47,6 +55,12 @@ The simulation has no deliberately introduced enforcement blitz. It does contain
 | Total observations | **280** |
 | Groups analyzed | **8** |
 | Monitoring alerts | **6** |
+| Observed vehicles | **240,363** |
+| Observed stops | **2,643** |
+| Baseline rate (stops per 1,000 vehicles) | **10.19** |
+| Monitoring rate (stops per 1,000 vehicles) | **12.21** |
+| Relative rate change | **+19.8%** |
+| Groups with signals | **2 / 8** |
 
 Select **Zone_C** and **evening**. The five observed rates for **September 25–29** should climb far above the upper control limit. Those five intentionally planted anomalous observations are flagged. The sixth alert is the same incidental Zone_A evening signal from the baseline scenario.
 
@@ -67,6 +81,12 @@ Select **Zone_C** and **evening**. The five observed rates for **September 25–
 | Total observations | **280** |
 | Groups analyzed | **8** |
 | Monitoring alerts | **1** |
+| Observed vehicles | **244,788** |
+| Observed stops | **2,491** |
+| Baseline rate (stops per 1,000 vehicles) | **10.19** |
+| Monitoring rate (stops per 1,000 vehicles) | **10.16** |
+| Relative rate change | **-0.3%** |
+| Groups with signals | **1 / 8** |
 
 Again select **Zone_C** and **evening**. In the five-day September 25–29 window, the number of observed vehicles doubles while the underlying enforcement stop rate remains unchanged. The **UCL and LCL move closer together** as the exposure increases, and the observed rates remain within these limits on all five target evenings.
 
