@@ -5,7 +5,7 @@ import {
   CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts'
 import { analyzeCsv } from './api'
-import { OverviewInsights, InvestigationDetails } from './Insights'
+import { OverviewInsights, InvestigationDetails } from './Insights.jsx'
 import './App.css'
 
 function App() {
